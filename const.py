@@ -13,6 +13,7 @@ INIT_NAME = "a"
 INIT_FREQ = 440.0
 INIT_MIDI = 57
 
+CHANNELS = [0, 1, 2, 3, 4, 5, 6, 7]
 
 NOTE_NAMES = [
     "fb", "cb", "gb", "db", "ab", "eb", "bb",
