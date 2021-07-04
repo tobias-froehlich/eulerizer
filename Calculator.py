@@ -72,9 +72,9 @@ class Calculator:
                     )*12
                 )
 
-        for i in range(len(self.__bendings)):
-            print(self.__eulis[i])
-            print(self.__bendings[i])
+#        for i in range(len(self.__bendings)):
+#            print(self.__eulis[i])
+#            print(self.__bendings[i])
 
         return (self.__eulis, self.__bendings)
  

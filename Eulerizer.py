@@ -1,8 +1,15 @@
 import numpy as np
+import serial
 import mido
 import time
 import Calculator
 import const
+
+arduino = serial.Serial(
+    "/dev/ttyUSB0",
+    9600
+)
+
 
 class Saite:
 
@@ -33,6 +40,17 @@ class Eulerizer:
         midis = self.__port_in.poll()
         if midis:
             print(midis)
+        if (arduino.inWaiting() > 0):
+            arduino_value = arduino.read()
+            if (arduino_value == b'3'):
+                print("region=3", flush=True)
+            if (arduino_value == b'4'):
+                print("region=4", flush=True)
+            if (arduino_value == b'5'):
+                print("region=5", flush=True)
+        time.sleep(0.01)
+        
+
         
 
 if __name__ == "__main__":
