@@ -69,7 +69,7 @@ class Calculator:
                     np.log2(
                         self.__intonations[i][note]
                       / self.__equal_freqs[note]
-                    )*12
+                    )*12 / const.BENDING
                 )
 
 #        for i in range(len(self.__bendings)):

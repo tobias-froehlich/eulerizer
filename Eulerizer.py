@@ -5,10 +5,10 @@ import time
 import Calculator
 import const
 
-#arduino = serial.Serial(
-#    "/dev/ttyUSB0",
-#    9600
-#)
+arduino = serial.Serial(
+    "/dev/ttyUSB0",
+    9600
+)
 
 
 class Saite:
@@ -25,7 +25,7 @@ class Saite:
     def is_playing(self):
         return self.__playing
 
-    def start_note(self, euli, midi, bending):
+    def start_note(self, euli, midi, bending, velocity):
         self.__euli = euli
         self.__midi = midi
         self.__bending = bending
@@ -42,7 +42,8 @@ class Saite:
             mido.Message(
                 "note_on",
                 channel=self.__channel,
-                note=self.__midi
+                note=self.__midi,
+                velocity=velocity
             )
         )
 #        print("starting note on channel", self.__channel)
@@ -96,12 +97,36 @@ class Eulerizer:
 
 #        print("inizialized")
 
+    def __play_test(self):
+        for i in range(len(self.__saiten)):
+            saite1 = self.__saiten[i]
+            saite2 = self.__saiten[(i+1) % len(self.__saiten)]
+            saite1.start_note((0, 0), 57, 0, 100)
+            saite2.start_note((0, 0), 57-const.BENDING, 1, 100)
+            time.sleep(0.25)
+            saite1.release_key(57)
+            saite1.release_pedal()
+            saite2.release_key(57-const.BENDING)
+            saite2.release_pedal()
+            time.sleep(0.25)
+
     def loop(self):
         message = self.__port_in.poll()
         if message:
             typ = message.type
             if typ == "note_on":
+                if message.velocity == 0:
+                    typ = "note_off"
+            if typ == "control_change":
+                if message.control == 64:
+                    if message.value > 50:
+                        self.__pedal_pressed = True
+                    else:
+                        self.__pedal_pressed = False
+            if typ == "note_on":
                 midi = message.note
+                if midi == 108:
+                    self.__play_test()
                 index = self.__priorities.index(
                     max(self.__priorities)
                 )
@@ -114,7 +139,8 @@ class Eulerizer:
                         midi,
                         self.__bendings
                             [self.__region]
-                            [midi] 
+                            [midi],
+                        message.velocity
                     )
                     self.__priorities[index] = 0
 #                    for i in range(len(const.CHANNELS)):
@@ -137,14 +163,23 @@ class Eulerizer:
                         
                 
                 
-#        if (arduino.inWaiting() > 0):
-#            arduino_value = arduino.read()
-#            if (arduino_value == b'3'):
-#                print("region=3", flush=True)
-#            if (arduino_value == b'4'):
-#                print("region=4", flush=True)
-#            if (arduino_value == b'5'):
-#                print("region=5", flush=True)
+        if (arduino.inWaiting() > 0):
+            arduino_value = arduino.read()
+            if (arduino_value == b'2'):
+                print("region=2", flush=True)
+                self.__region = 2
+            if (arduino_value == b'3'):
+                print("region=3", flush=True)
+                self.__region = 3
+            if (arduino_value == b'4'):
+                print("region=4", flush=True)
+                self.__region = 4
+            if (arduino_value == b'5'):
+                print("region=5", flush=True)
+                self.__region = 5
+            if (arduino_value == b'6'):
+                print("region=6", flush=True)
+                self.__region = 6
         time.sleep(0.01)
         
 

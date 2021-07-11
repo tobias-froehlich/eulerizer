@@ -77,6 +77,11 @@ class Gui(tk.Frame):
         self.__dots_big = []
         self.__images = [] # preventing garbage
                            # collection
+        self.__playing = []
+        for j in range(const.EULER_ROWS):
+            self.__playing.append([])
+            for i in range(const.EULER_COLS):
+                self.__playing[-1].append(0)
         index_init = const.NOTE_NAMES.index(
             const.INIT_NAME
         )
@@ -147,24 +152,28 @@ class Gui(tk.Frame):
             )
 
     def note_on(self, i, j):
-        self.__canvas.itemconfigure(
-            self.__dots_small[j][i],
-            state=tk.HIDDEN
-        )
-        self.__canvas.itemconfigure(
-            self.__dots_big[j][i],
-            state=tk.NORMAL
-        )
+        self.__playing[j][i] += 1
+        if self.__playing[j][i] > 0:
+            self.__canvas.itemconfigure(
+                self.__dots_small[j][i],
+                state=tk.HIDDEN
+            )
+            self.__canvas.itemconfigure(
+                self.__dots_big[j][i],
+                state=tk.NORMAL
+            )
 
     def note_off(self, i, j):
-        self.__canvas.itemconfigure(
-            self.__dots_small[j][i],
-            state=tk.NORMAL
-        )
-        self.__canvas.itemconfigure(
-            self.__dots_big[j][i],
-            state=tk.HIDDEN
-        )
+        self.__playing[j][i] -= 1
+        if self.__playing[j][i] == 0:
+            self.__canvas.itemconfigure(
+                self.__dots_small[j][i],
+                state=tk.NORMAL
+            )
+            self.__canvas.itemconfigure(
+                self.__dots_big[j][i],
+                state=tk.HIDDEN
+            )
 
 
 
