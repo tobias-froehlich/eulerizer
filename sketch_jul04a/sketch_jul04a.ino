@@ -10,11 +10,11 @@ int old5SensorValue = 0;
 
 int precision = 3;
 
-int value2 = 832;
-int value3 = 839; 
-int value4 = 847;
-int value5 = 857;
-int value6 = 865;
+int value2 = 836;
+int value3 = 843; 
+int value4 = 850;
+int value5 = 861;
+int value6 = 869;
 
 int lastOutput = -1;
 
