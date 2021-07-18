@@ -2,79 +2,22 @@ import numpy as np
 import serial
 import mido
 import time
-import Calculator
+from Calculator import Calculator
+from Saite import Saite
+from ChannelManager import ChannelManager
 import const
 
-arduino = serial.Serial(
-    "/dev/ttyUSB0",
-    9600
-)
+#arduino = serial.Serial(
+#    "/dev/ttyUSB0",
+#    9600
+#)
 
-
-class Saite:
-
-    def __init__(self, port_out, channel):
-        self.__port_out = port_out
-        self.__channel = channel
-        self.__euli = (0, 0)
-        self.__midi = 0
-        self.__bending = 0.
-        self.__pressed = False
-        self.__playing = False
-
-    def is_playing(self):
-        return self.__playing
-
-    def start_note(self, euli, midi, bending, velocity):
-        self.__euli = euli
-        self.__midi = midi
-        self.__bending = bending
-        self.__pressed = True
-        self.__playing = True
-        self.__port_out.send(
-            mido.Message(
-                "pitchwheel",
-                channel=self.__channel,
-                pitch=round(bending * 8191)
-            )
-        )
-        self.__port_out.send(
-            mido.Message(
-                "note_on",
-                channel=self.__channel,
-                note=self.__midi,
-                velocity=velocity
-            )
-        )
-#        print("starting note on channel", self.__channel)
-        print("note_on=%i,%i"%(self.__euli[0], self.__euli[1]), flush=True)
-
-    def release_key(self, midi):
-        if midi == self.__midi:
-            if self.__pressed:
-                self.__pressed = False
-                return True
-        return False
-
-    def release_pedal(self):
-        if not self.__pressed:
-            if self.__playing:
-                self.__playing = False
-                self.__port_out.send(
-                    mido.Message(
-                        "note_off",
-                        channel=self.__channel,
-                        note=self.__midi
-                    )
-                )
-                print("note_off=%i,%i"%(self.__euli[0], self.__euli[1]), flush=True)
-#                print("stopping note on channel", self.__channel)
 
 class Eulerizer:
 
     def __init__(self):
         (self.__eulis, self.__bendings) \
-            = Calculator.Calculator()()
+            = Calculator()()
         self.__port_in = mido.open_input(
             name="eulerizer",
             client_name="eulerizer",
@@ -89,13 +32,16 @@ class Eulerizer:
         self.__pedal_pressed = False
         self.__saiten = []
         self.__priorities = []
-        for channel in const.CHANNELS:
+        self.__channel_manager = ChannelManager()
+        for s in range(const.NUMBER_OF_SAITEN):
             self.__saiten.append(
-                Saite(self.__port_out, channel)
+                Saite(
+                    self.__port_out,
+                    self.__channel_manager
+                )
             )
             self.__priorities.append(100)
 
-#        print("inizialized")
 
     def __play_test(self):
         for i in range(len(self.__saiten)):
@@ -110,6 +56,43 @@ class Eulerizer:
             saite2.release_pedal()
             time.sleep(0.25)
 
+    def __handle_control_change(self, message):
+        if message.control == 64:
+           if message.value > 50:
+               self.__pedal_pressed = True
+           else:
+               self.__pedal_pressed = False
+
+    def __handle_note_on(self, message):
+        midi = message.note
+        if midi == 108:
+            self.__play_test()
+        index = self.__priorities.index(
+            max(self.__priorities)
+        )
+        saite = self.__saiten[index]
+        print(self.__priorities)
+        euli = self.__eulis[self.__region][midi]
+        bending = self.__bendings[self.__region][midi]
+        if not saite.is_playing():
+            print("Start saite ", index)
+            saite.start_note(
+                euli,
+                midi,
+                bending,
+                message.velocity
+            )
+            self.__priorities[index] = 0
+
+    def __handle_note_off(self, message):
+        midi = message.note
+        for s in range(const.NUMBER_OF_SAITEN):
+            if self.__saiten[s].release_key(midi):
+                self.__priorities[s] = 0
+        for s in range(const.NUMBER_OF_SAITEN):
+            if not self.__saiten[s].is_playing():
+                self.__priorities[s] += 1
+ 
     def loop(self):
         message = self.__port_in.poll()
         if message:
@@ -118,69 +101,34 @@ class Eulerizer:
                 if message.velocity == 0:
                     typ = "note_off"
             if typ == "control_change":
-                if message.control == 64:
-                    if message.value > 50:
-                        self.__pedal_pressed = True
-                    else:
-                        self.__pedal_pressed = False
+                self.__handle_control_change(message)
             if typ == "note_on":
-                midi = message.note
-                if midi == 108:
-                    self.__play_test()
-                index = self.__priorities.index(
-                    max(self.__priorities)
-                )
-                saite = self.__saiten[index]
-                if not saite.is_playing():
-                    saite.start_note(
-                        self.__eulis
-                            [self.__region]
-                            [midi],
-                        midi,
-                        self.__bendings
-                            [self.__region]
-                            [midi],
-                        message.velocity
-                    )
-                    self.__priorities[index] = 0
-#                    for i in range(len(const.CHANNELS)):
-#                        if not self.__saiten[i].is_playing():
-#                            self.__priorities[i] += 1
-#                print(self.__priorities)
+                self.__handle_note_on(message)
             elif typ == "note_off":
-                midi = message.note
-                for i in range(len(const.CHANNELS)):
-                    if self.__saiten[i].release_key(midi):
-                        self.__priorities[i] = 0
-                for i in range(len(const.CHANNELS)):
-                    if not self.__saiten[i].is_playing():
-                        self.__priorities[i] += 1
-#                print(self.__priorities)
-
+                self.__handle_note_off(message)
+                
             if not self.__pedal_pressed:
                 for saite in self.__saiten:
                     saite.release_pedal()
-                        
-                
-                
-        if (arduino.inWaiting() > 0):
-            arduino_value = arduino.read()
-            if (arduino_value == b'2'):
-                print("region=2", flush=True)
-                self.__region = 2
-            if (arduino_value == b'3'):
-                print("region=3", flush=True)
-                self.__region = 3
-            if (arduino_value == b'4'):
-                print("region=4", flush=True)
-                self.__region = 4
-            if (arduino_value == b'5'):
-                print("region=5", flush=True)
-                self.__region = 5
-            if (arduino_value == b'6'):
-                print("region=6", flush=True)
-                self.__region = 6
-        time.sleep(0.01)
+                                                       
+#        if (arduino.inWaiting() > 0):
+#            arduino_value = arduino.read()
+#            if (arduino_value == b'2'):
+#                print("region=2", flush=True)
+#                self.__region = 2
+#            if (arduino_value == b'3'):
+#                print("region=3", flush=True)
+#                self.__region = 3
+#            if (arduino_value == b'4'):
+#                print("region=4", flush=True)
+#                self.__region = 4
+#            if (arduino_value == b'5'):
+#                print("region=5", flush=True)
+#                self.__region = 5
+#            if (arduino_value == b'6'):
+#                print("region=6", flush=True)
+#                self.__region = 6
+#        time.sleep(0.01)
         
 
         
