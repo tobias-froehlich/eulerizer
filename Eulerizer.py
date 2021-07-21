@@ -165,6 +165,12 @@ class Eulerizer:
                 
         if (arduino.inWaiting() > 0):
             arduino_value = arduino.read()
+            if (arduino_value == b'0'):
+                print("region=0", flush=True)
+                self.__region = 0
+            if (arduino_value == b'1'):
+                print("region=1", flush=True)
+                self.__region = 1
             if (arduino_value == b'2'):
                 print("region=2", flush=True)
                 self.__region = 2
@@ -180,6 +186,9 @@ class Eulerizer:
             if (arduino_value == b'6'):
                 print("region=6", flush=True)
                 self.__region = 6
+            if (arduino_value == b'7'):
+                print("region=7", flush=True)
+                self.__region = 7
         time.sleep(0.01)
         
 
