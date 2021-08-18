@@ -1,9 +1,9 @@
 import numpy as np
 import serial
-import mido
-import time
+from MidiConnection import MidiConnection
 import Calculator
-import const
+import time
+from const import *
 
 arduino = serial.Serial(
     "/dev/ttyUSB0",
@@ -11,107 +11,31 @@ arduino = serial.Serial(
 )
 
 
-class Saite:
-
-    def __init__(self, port_out, channel):
-        self.__port_out = port_out
-        self.__channel = channel
-        self.__euli = (0, 0)
-        self.__midi = 0
-        self.__bending = 0.
-        self.__pressed = False
-        self.__playing = False
-
-    def is_playing(self):
-        return self.__playing
-
-    def start_note(self, euli, midi, bending, velocity):
-        self.__euli = euli
-        self.__midi = midi
-        self.__bending = bending
-        self.__pressed = True
-        self.__playing = True
-        self.__port_out.send(
-            mido.Message(
-                "pitchwheel",
-                channel=self.__channel,
-                pitch=round(bending * 8191)
-            )
-        )
-        self.__port_out.send(
-            mido.Message(
-                "note_on",
-                channel=self.__channel,
-                note=self.__midi,
-                velocity=velocity
-            )
-        )
-#        print("starting note on channel", self.__channel)
-        print("note_on=%i,%i"%(self.__euli[0], self.__euli[1]), flush=True)
-
-    def release_key(self, midi):
-        if midi == self.__midi:
-            if self.__pressed:
-                self.__pressed = False
-                return True
-        return False
-
-    def release_pedal(self):
-        if not self.__pressed:
-            if self.__playing:
-                self.__playing = False
-                self.__port_out.send(
-                    mido.Message(
-                        "note_off",
-                        channel=self.__channel,
-                        note=self.__midi
-                    )
-                )
-                print("note_off=%i,%i"%(self.__euli[0], self.__euli[1]), flush=True)
-#                print("stopping note on channel", self.__channel)
-
 class Eulerizer:
 
     def __init__(self):
-        (self.__eulis, self.__bendings) \
-            = Calculator.Calculator()()
-        self.__port_in = mido.open_input(
-            name="eulerizer",
-            client_name="eulerizer",
-            virtual=True
-        )
-        self.__port_out = mido.open_output(
-            name="eulerizer",
-            client_name="eulerizer",
-            virtual=True
-        )
+        (self.__eulis, self.__bendings) = \
+            Calculator.Calculator()()
+        self.__midi_connection = MidiConnection()
         self.__region = 4
         self.__pedal_pressed = False
-        self.__saiten = []
-        self.__priorities = []
-        for channel in const.CHANNELS:
-            self.__saiten.append(
-                Saite(self.__port_out, channel)
-            )
-            self.__priorities.append(100)
-
-#        print("inizialized")
-
-    def __play_test(self):
-        for i in range(len(self.__saiten)):
-            saite1 = self.__saiten[i]
-            saite2 = self.__saiten[(i+1) % len(self.__saiten)]
-            saite1.start_note((0, 0), 57, 0, 100)
-            saite2.start_note((0, 0), 57-const.BENDING, 1, 100)
-            time.sleep(0.25)
-            saite1.release_key(57)
-            saite1.release_pedal()
-            saite2.release_key(57-const.BENDING)
-            saite2.release_pedal()
-            time.sleep(0.25)
+        self.__pressed = np.zeros(
+            (len(CHANNELS), 128),
+            dtype="int32"
+        )
+        self.__sounding = np.zeros(
+            (len(CHANNELS), 128),
+            dtype="int32"
+        )
+        self.__priority = np.zeros(
+            len(CHANNELS),
+            dtype="int32"
+        ) + 100
+        self.__euli = [None]*len(CHANNELS)
 
     def loop(self):
-        message = self.__port_in.poll()
+        message = \
+            self.__midi_connection.get_message()
         if message:
             typ = message.type
             if typ == "note_on":
@@ -125,42 +49,70 @@ class Eulerizer:
                         self.__pedal_pressed = False
             if typ == "note_on":
                 midi = message.note
-                if midi == 108:
-                    self.__play_test()
-                index = self.__priorities.index(
-                    max(self.__priorities)
-                )
-                saite = self.__saiten[index]
-                if not saite.is_playing():
-                    saite.start_note(
-                        self.__eulis
-                            [self.__region]
-                            [midi],
-                        midi,
-                        self.__bendings
-                            [self.__region]
-                            [midi],
-                        message.velocity
+                velocity = message.velocity
+                euli = self.__eulis \
+                    [self.__region][midi]
+                bending = self.__bendings \
+                    [self.__region][midi]
+                if euli in self.__euli:
+                    j = self.__euli.index(euli)
+                    self.__midi_connection \
+                        .start_note(
+                            midi,
+                            velocity,
+                            bending,
+                            CHANNELS[j]
+                        )
+                    self.__pressed[j, midi] = 1
+                    self.__sounding[j, midi] = 1
+                else:
+#                    print(self.__priority)
+                    j = self.__priority.argmax()
+                    self.__euli[j] = euli
+                    self.__midi_connection \
+                        .start_note(
+                            midi,
+                            velocity,
+                            bending,
+                            CHANNELS[j]
+                        )
+                    self.__priority[j] = 0
+                    self.__pressed[j, midi] = 1
+                    self.__sounding[j, midi] = 1
+#                print(self.__priority)
+                    print(
+                        "note_on=%i,%i"%euli,
+                        flush=True
                     )
-                    self.__priorities[index] = 0
-#                    for i in range(len(const.CHANNELS)):
-#                        if not self.__saiten[i].is_playing():
-#                            self.__priorities[i] += 1
-#                print(self.__priorities)
             elif typ == "note_off":
                 midi = message.note
-                for i in range(len(const.CHANNELS)):
-                    if self.__saiten[i].release_key(midi):
-                        self.__priorities[i] = 0
-                for i in range(len(const.CHANNELS)):
-                    if not self.__saiten[i].is_playing():
-                        self.__priorities[i] += 1
-#                print(self.__priorities)
+                self.__pressed[:, midi] = 0
 
             if not self.__pedal_pressed:
-                for saite in self.__saiten:
-                    saite.release_pedal()
-                        
+                sounding_but_not_pressed = \
+                    self.__sounding - self.__pressed
+                jis = np.argwhere(
+                    sounding_but_not_pressed
+                )
+                for ji in jis:
+                    j = ji[0]
+                    i = ji[1]
+                    self.__sounding[j, i] = 0
+                    self.__midi_connection \
+                        .stop_note(
+                            i,
+                            CHANNELS[j]
+                        )
+                    euli = self.__euli[j]
+                    if self.__sounding[j].sum() == 0:
+                        self.__priority[j] = 10
+                        self.__euli[j] = None
+                        print(
+                            "note_off=%i,%i"%euli,
+                            flush=True
+                        )
+                self.__priority += (self.__priority >= 10)
+                       
                 
                 
         if (arduino.inWaiting() > 0):
