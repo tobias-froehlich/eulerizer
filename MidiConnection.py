@@ -47,3 +47,28 @@ class MidiConnection:
             )
         )
 
+    def send_through(self, message):
+        self.__port_out.send(
+            message
+        )
+
+    def send_stop_signal(self):
+        self.__port_out.panic()
+#        self.__port_out.send(
+#            mido.Message(
+#                "sysex",
+#                data=(127,127,6,1),
+#                time=0
+#            )
+#        )
+#        self.__port_out.send(
+#            mido.Message("stop", time=0)
+#        )
+#        self.__port_out.send(
+#            mido.Message(
+#                "sysex",
+#                data=(127,127,6,68,6,1,0,0,3,14,0),
+#                time=0
+#            )
+#        )
+        
