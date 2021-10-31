@@ -26,7 +26,7 @@ class MidiConnection:
             mido.Message(
                 "pitchwheel",
                 channel=channel,
-                pitch=round(bending * 8191)
+                pitch=int(round(bending * 8191))
             )
         )
         self.__port_out.send(
