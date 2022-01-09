@@ -13,7 +13,14 @@ INIT_NAME = "a"
 INIT_FREQ = 440.0
 INIT_MIDI = 57
 
-CHANNELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15]
+FACTOR_TWO = 2.0
+FACTOR_THREE = 3.0
+FACTOR_FIVE = 5.0
+
+NO_BENDING = False
+
+CHANNELS = [2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15]
+OCTAVES_SHARE_CHANNEL = True
 
 NOTE_NAMES = [
     "fb", "cb", "gb", "db", "ab", "eb", "bb",

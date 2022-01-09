@@ -42,7 +42,7 @@ class Eulerizer:
                 if message.velocity == 0:
                     typ = "note_off"
             if typ == "control_change":
-                if message.control == 64:
+                if message.control == 66:
                     if message.value > 50:
                         self.__pedal_pressed = True
                     else:
@@ -54,7 +54,7 @@ class Eulerizer:
                     [self.__region][midi]
                 bending = self.__bendings \
                     [self.__region][midi]
-                if euli in self.__euli:
+                if euli in self.__euli and OCTAVES_SHARE_CHANNEL:
                     j = self.__euli.index(euli)
                     self.__midi_connection \
                         .start_note(
@@ -66,7 +66,6 @@ class Eulerizer:
                     self.__pressed[j, midi] = 1
                     self.__sounding[j, midi] = 1
                 else:
-#                    print(self.__priority)
                     j = self.__priority.argmax()
                     self.__euli[j] = euli
                     self.__midi_connection \
@@ -79,7 +78,6 @@ class Eulerizer:
                     self.__priority[j] = 0
                     self.__pressed[j, midi] = 1
                     self.__sounding[j, midi] = 1
-#                print(self.__priority)
                     print(
                         "note_on=%i,%i"%euli,
                         flush=True

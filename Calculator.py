@@ -18,8 +18,8 @@ class Calculator:
                 )
                 self.__freqs[-1].append(
                     const.INIT_FREQ
-                  * (3/2)**(i - const.INIT_POS[0])
-                  * (5/4)**(j - const.INIT_POS[1])
+                  * (const.FACTOR_THREE/const.FACTOR_TWO)**(i - const.INIT_POS[0])
+                  * (const.FACTOR_FIVE/const.FACTOR_TWO**2)**(j - const.INIT_POS[1])
                 )
         for j in range(const.EULER_ROWS):
             for i in range(const.EULER_COLS):
@@ -27,7 +27,7 @@ class Calculator:
                 freq = self.__freqs[j][i]
                 oct = midi // 12
                 self.__midis[j][i] = midi % 12
-                self.__freqs[j][i] = freq / 2**(oct)
+                self.__freqs[j][i] = freq / const.FACTOR_TWO**(oct)
 
         self.__intonations = []
         self.__eulis = []
@@ -49,7 +49,7 @@ class Calculator:
             for note in range(128):
                 self.__intonations[-1].append(
                     freqs[midis.index(note%12)]
-                  * 2 ** (note // 12)
+                  * const.FACTOR_TWO ** (note // 12)
                 )
                 self.__eulis[-1].append(
                     eulis[midis.index(note%12)]
@@ -60,7 +60,7 @@ class Calculator:
         for note in range(128):
             self.__equal_freqs.append(
                 440.0
-              * 2**((note - 57)/12)
+              * 2.0**((note - 57)/12)
             )
         for i in range(const.EULER_COLS - 3):
             self.__bendings.append([])
@@ -69,7 +69,7 @@ class Calculator:
                     np.log2(
                         self.__intonations[i][note]
                       / self.__equal_freqs[note]
-                    )*12 / const.BENDING
+                    )*12 / const.BENDING * (const.NO_BENDING == False)
                 )
 
 #        for i in range(len(self.__bendings)):
