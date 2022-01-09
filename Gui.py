@@ -175,7 +175,19 @@ class Gui(tk.Frame):
                 state=tk.HIDDEN
             )
 
-
+    def reset(self):
+        for j in range(const.EULER_ROWS):
+            for i in range(const.EULER_COLS):
+                print("reset ", j, i)
+                self.__playing[j][i] = 0
+                self.__canvas.itemconfigure(
+                    self.__dots_small[j][i],
+                    state=tk.NORMAL
+                )
+                self.__canvas.itemconfigure(
+                    self.__dots_big[j][i],
+                    state=tk.HIDDEN
+                )
 
 
 if __name__ == "__main__":
@@ -207,6 +219,9 @@ if __name__ == "__main__":
                 int(subwords[0]),
                 int(subwords[1])
             )
+            root.after(1, task)
+        elif words[0] == "reset":
+            gui.reset()
             root.after(1, task)
    
     root.after(0, task)

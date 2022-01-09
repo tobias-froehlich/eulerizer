@@ -4,7 +4,7 @@ import const
 
 class Calculator:
 
-    def __call__(self):
+    def __call__(self, bending):
         self.__midis = []
         self.__freqs = []
         for j in range(const.EULER_ROWS):

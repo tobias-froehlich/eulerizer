@@ -7,12 +7,12 @@ REGION_COLOR = "#bbb"
 REGION_BORDER_COLOR = "#444"
 REGION_BORDER_WIDTH = 4
 
-BENDING = 2
 INIT_POS = (5, 1)
 INIT_NAME = "a"
 INIT_FREQ = 440.0
 INIT_MIDI = 57
 
+<<<<<<< HEAD
 FACTOR_TWO = 2.0
 FACTOR_THREE = 3.0
 FACTOR_FIVE = 5.0
@@ -21,6 +21,36 @@ NO_BENDING = False
 
 CHANNELS = [2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15]
 OCTAVES_SHARE_CHANNEL = True
+=======
+CTRL_CHANNEL = 9
+PARAMS = [
+    {   
+        "IN_CHANNEL": 0,
+        "CHANNELS": [0, 1],
+        "BENDING": 2
+    },
+    {   
+        "IN_CHANNEL": 1,
+        "CHANNELS": [2, 3],
+        "BENDING": 2
+    },
+    {   
+        "IN_CHANNEL": 2,
+        "CHANNELS": [4, 5],
+        "BENDING": 2
+    },
+    {   
+        "IN_CHANNEL": 3,
+        "CHANNELS": [6, 7],
+        "BENDING": 2
+    },
+    {   
+        "IN_CHANNEL": 4,
+        "CHANNELS": [8, 10],
+        "BENDING": 2
+    },
+]
+>>>>>>> oldversion
 
 NOTE_NAMES = [
     "fb", "cb", "gb", "db", "ab", "eb", "bb",
