@@ -18,6 +18,8 @@ FACTOR_FIVE = 5.0
 
 NO_BENDING = False
 
+OCTAVES_SHARE_CHANNELS = False
+
 CTRL_CHANNEL = 9
 PARAMS = [
     {   

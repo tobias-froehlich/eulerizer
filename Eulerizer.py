@@ -60,7 +60,7 @@ class Eulerizer:
                         [self.__region][midi]
                     bending = self.__bendings \
                         [self.__region][midi]
-                    if euli in self.__euli:
+                    if euli in self.__euli and OCTAVES_SHARE_CHANNEL:
                         j = self.__euli.index(euli)
                         self.__midi_connection \
                             .start_note(
