@@ -7,6 +7,7 @@ class Calculator:
     def __call__(self, bending):
         self.__midis = []
         self.__freqs = []
+        self.__bending = bending
         for j in range(const.EULER_ROWS):
             self.__midis.append([])
             self.__freqs.append([])
@@ -69,7 +70,7 @@ class Calculator:
                     np.log2(
                         self.__intonations[i][note]
                       / self.__equal_freqs[note]
-                    )*12 / const.BENDING * (const.NO_BENDING == False)
+                    )*12 / self.__bending * (const.NO_BENDING == False)
                 )
 
 #        for i in range(len(self.__bendings)):
