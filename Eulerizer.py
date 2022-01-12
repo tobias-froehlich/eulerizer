@@ -48,7 +48,7 @@ class Eulerizer:
                     if message.velocity == 0:
                         typ = "note_off"
                 if typ == "control_change":
-                    if message.control == 64:
+                    if message.control == 66:
                         if message.value > 50:
                             self.__pedal_pressed = True
                         else:
@@ -119,7 +119,7 @@ class Eulerizer:
                             )
                     self.__priority += (self.__priority >= 10)
 
-        time.sleep(0.001)
+        time.sleep(0.005)
                 
     def setRegion(self, region):
         self.__region = region
@@ -147,7 +147,8 @@ if __name__ == "__main__":
 #                        eulerizer.setRegion(region)
 #                     print("region=%i"%(region), flush=True)
             if message.type == "note_on" or \
-               message.type == "note_off":
+               message.type == "note_off" or \
+               message.type == "control_change":
                  if message.channel != CTRL_CHANNEL:
                      for eulerizer in eulerizers:
                          eulerizer.loop(message)
