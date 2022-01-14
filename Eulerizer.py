@@ -1,14 +1,9 @@
 import numpy as np
-import serial
 from MidiConnection import MidiConnection
 import Calculator
 import time
 from const import *
 
-arduino = serial.Serial(
-    "/dev/ttyUSB0",
-    9600
-)
 
 class Eulerizer:
 
@@ -16,8 +11,8 @@ class Eulerizer:
         bendings, param):
         (self.__eulis, self.__bendings) = \
             (eulis, bendings)
-        self.__in_channel = param["IN_CHANNEL"]
-        self.__channels = param["CHANNELS"]
+        self.__in_channel = param["IN_CHANNEL"] - 1
+        self.__channels = [c - 1 for c in param["CHANNELS"]]
         self.__bending = param["BENDING"]
         self.__midi_connection = midi_connection
         self.__region = 4
@@ -118,9 +113,7 @@ class Eulerizer:
                                 flush=True
                             )
                     self.__priority += (self.__priority >= 10)
-
-        time.sleep(0.005)
-                
+ 
     def setRegion(self, region):
         self.__region = region
 
@@ -140,51 +133,17 @@ if __name__ == "__main__":
                 for eulerizer in eulerizers:
                     eulerizer.reset()
                 print("reset=true", flush=True)
-#            if message.type == "note_on":
-#                if message.channel == CTRL_CHANNEL:
-#                    region = message.note - 56
-#                    for eulerizer in eulerizers:
-#                        eulerizer.setRegion(region)
-#                     print("region=%i"%(region), flush=True)
             if message.type == "note_on" or \
                message.type == "note_off" or \
                message.type == "control_change":
-                 if message.channel != CTRL_CHANNEL:
+                 if message.channel != CTRL_CHANNEL - 1:
                      for eulerizer in eulerizers:
                          eulerizer.loop(message)
-        if (arduino.inWaiting() > 0):
-            arduino_value = arduino.read()
-            if (arduino_value == b'0'):
-                print("region=0", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(0)
-            if (arduino_value == b'1'):
-                print("region=1", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(1)
-            if (arduino_value == b'2'):
-                print("region=2", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(2)
-            if (arduino_value == b'3'):
-                print("region=3", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(3)
-            if (arduino_value == b'4'):
-                print("region=4", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(4)
-            if (arduino_value == b'5'):
-                print("region=5", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(5)
-            if (arduino_value == b'6'):
-                print("region=6", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(6)
-            if (arduino_value == b'7'):
-                print("region=7", flush=True)
-                for eulerizer in eulerizers:
-                    eulerizer.setRegion(7)
-
-            time.sleep(0.001)
+                 else:
+                     if message.type == "note_on":
+                         region = message.note - 56
+                         if 0 <= region < 8:
+                             for eulerizer in eulerizers:
+                                 eulerizer.setRegion(region)
+                             print("region=%i"%(region), flush=True)
+        time.sleep(0.001)

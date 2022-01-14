@@ -12,19 +12,19 @@ INIT_NAME = "a"
 INIT_FREQ = 440.0
 INIT_MIDI = 57
 
-FACTOR_TWO = 2.06
-FACTOR_THREE = 3.15
-FACTOR_FIVE = 5.35
+FACTOR_TWO = 2.02
+FACTOR_THREE = 3.05
+FACTOR_FIVE = 5.10
 
 NO_BENDING = False
 
 OCTAVES_SHARE_CHANNEL = False
 
-CTRL_CHANNEL = 9
+CTRL_CHANNEL = 10
 PARAMS = [
     {   
-        "IN_CHANNEL": 0,
-        "CHANNELS": [2, 3, 4, 5, 6, 7, 8 , 10, 11, 12, 13, 14, 15],
+        "IN_CHANNEL": 1,
+        "CHANNELS": [1, 2, 3, 4, 5, 6, 7, 8],
         "BENDING": 12
     },
 ]
