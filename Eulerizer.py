@@ -2,6 +2,7 @@ import numpy as np
 from MidiConnection import MidiConnection
 import Calculator
 import time
+import threading
 from const import *
 
 
@@ -120,12 +121,23 @@ class Eulerizer:
         
 
 if __name__ == "__main__":
+
+
+    flag = [1]
+    def userInputTask(flag):
+        while flag[0]:
+            userInput = input()
+            if userInput == "quit":
+                flag[0] = 0
+    userInputThread = threading.Thread(target=userInputTask, args=(flag,))
+    userInputThread.start()
+
     midi_connection = MidiConnection()
     eulerizers = []
     for param in PARAMS:
         (eulis, bendings) = Calculator.Calculator()(param["BENDING"])
         eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param))
-    while True:
+    while flag[0]:
         message = midi_connection.get_message()
         if message:
             if message.type == "stop":
@@ -147,3 +159,6 @@ if __name__ == "__main__":
                                  eulerizer.setRegion(region)
                              print("region=%i"%(region), flush=True)
         time.sleep(0.001)
+
+    print("quit", flush=True)
+    userInputThread.join() 
