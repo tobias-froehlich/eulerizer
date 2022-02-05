@@ -4,10 +4,11 @@ import const
 
 class Calculator:
 
-    def __call__(self, bending):
+    def __call__(self, bending, noBending, factorTwo, factorThree, factorFive):
         self.__midis = []
         self.__freqs = []
         self.__bending = bending
+        self.__noBending = noBending
         for j in range(const.EULER_ROWS):
             self.__midis.append([])
             self.__freqs.append([])
@@ -19,8 +20,8 @@ class Calculator:
                 )
                 self.__freqs[-1].append(
                     const.INIT_FREQ
-                  * (const.FACTOR_THREE/const.FACTOR_TWO)**(i - const.INIT_POS[0])
-                  * (const.FACTOR_FIVE/const.FACTOR_TWO**2)**(j - const.INIT_POS[1])
+                  * (factorThree/factorTwo)**(i - const.INIT_POS[0])
+                  * (factorFive/factorTwo**2)**(j - const.INIT_POS[1])
                 )
         for j in range(const.EULER_ROWS):
             for i in range(const.EULER_COLS):
@@ -28,7 +29,7 @@ class Calculator:
                 freq = self.__freqs[j][i]
                 oct = midi // 12
                 self.__midis[j][i] = midi % 12
-                self.__freqs[j][i] = freq / const.FACTOR_TWO**(oct)
+                self.__freqs[j][i] = freq / factorTwo**(oct)
 
         self.__intonations = []
         self.__eulis = []
@@ -50,7 +51,7 @@ class Calculator:
             for note in range(128):
                 self.__intonations[-1].append(
                     freqs[midis.index(note%12)]
-                  * const.FACTOR_TWO ** (note // 12)
+                  * factorTwo ** (note // 12)
                 )
                 self.__eulis[-1].append(
                     eulis[midis.index(note%12)]
@@ -70,7 +71,7 @@ class Calculator:
                     np.log2(
                         self.__intonations[i][note]
                       / self.__equal_freqs[note]
-                    )*12 / self.__bending * (const.NO_BENDING == False)
+                    )*12 / self.__bending * (self.__noBending == False)
                 )
 
 #        for i in range(len(self.__bendings)):
