@@ -5,6 +5,13 @@ import time
 import threading
 from const import *
 
+if USE_SEVEN:
+    note_on_format_str = "note_on=%i,%i,%i"
+    note_off_format_str = "note_off=%i,%i,%i"
+else:
+    note_on_format_str = "note_on=%i,%i"
+    note_off_format_str = "note_off=%i,%i"
+
 
 class Eulerizer:
 
@@ -87,7 +94,7 @@ class Eulerizer:
                         self.__sounding[j, midi] = 1
     #                print(self.__priority)
                         print(
-                            "note_on=%i,%i"%euli,
+                            note_on_format_str%euli,
                             flush=True
                         )
                 elif typ == "note_off":
@@ -114,7 +121,7 @@ class Eulerizer:
                             self.__priority[j] = 10
                             self.__euli[j] = None
                             print(
-                                "note_off=%i,%i"%euli,
+                                note_off_format_str%euli,
                                 flush=True
                             )
                     self.__priority += (self.__priority >= 10)
@@ -132,6 +139,7 @@ if __name__ == "__main__":
     factorTwo = FACTOR_TWO
     factorThree = FACTOR_THREE
     factorFive = FACTOR_FIVE
+    factorSeven = FACTOR_SEVEN
     def userInputTask(flag, eulerizers, factorTwo, factorThree, factorFive):
         while flag[0]:
             userInput = input()
@@ -140,27 +148,27 @@ if __name__ == "__main__":
                 flag[0] = 0
             elif userInput == "off":
                 for i in range(len(PARAMS)):
-                    (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], True, factorTwo, factorThree, factorFive)
+                    (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], True, factorTwo, factorThree, factorFive, factorSeven)
                     eulerizers[i].setBendings(bendings)
             elif userInput == "on":
                 for i in range(len(PARAMS)):
-                    (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive)
+                    (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive, factorSeven)
                     eulerizers[i].setBendings(bendings)
             elif words[0] == "set":
                 if words[1] == "FACTOR_TWO":
                     for i in range(len(PARAMS)):
                         factorTwo = float(words[2])
-                        (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive)
+                        (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive, factorSeven)
                         eulerizers[i].setBendings(bendings)
                 elif words[1] == "FACTOR_THREE":
                     for i in range(len(PARAMS)):
                         factorThree = float(words[2])
-                        (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive)
+                        (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive, factorSeven)
                         eulerizers[i].setBendings(bendings)
                 elif words[1] == "FACTOR_FIVE":
                     for i in range(len(PARAMS)):
                         factorFive = float(words[2])
-                        (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive)
+                        (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive, factorSeven)
                         eulerizers[i].setBendings(bendings)
                     
     userInputThread = threading.Thread(target=userInputTask, args=(flag, eulerizers, factorTwo, factorThree, factorFive))
@@ -168,7 +176,7 @@ if __name__ == "__main__":
 
     midi_connection = MidiConnection()
     for param in PARAMS:
-        (eulis, bendings) = Calculator.Calculator()(param["BENDING"], NO_BENDING, FACTOR_TWO, FACTOR_THREE, FACTOR_FIVE)
+        (eulis, bendings) = Calculator.Calculator()(param["BENDING"], NO_BENDING, FACTOR_TWO, FACTOR_THREE, FACTOR_FIVE, FACTOR_SEVEN)
         eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param))
     while flag[0]:
         message = midi_connection.get_message()

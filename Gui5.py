@@ -27,7 +27,7 @@ class Gui(tk.Frame):
 
     def __make_canvas(self):
         (w, h) = self.__euler_to_coords(
-            const.EULER_COLS,
+            const.EULER_PEDALS + 3,
             0
         )
         w += const.EULERNET_DISTANCE
@@ -42,7 +42,7 @@ class Gui(tk.Frame):
 
     def __make_regions(self):
         self.__regions = []
-        for i in range(const.EULER_COLS - 3):
+        for i in range(const.EULER_PEDALS):
             (x0, y0) = self.__euler_to_coords(
                 i-0.5,
                 -0.5
@@ -80,7 +80,7 @@ class Gui(tk.Frame):
         self.__playing = []
         for j in range(const.EULER_ROWS):
             self.__playing.append([])
-            for i in range(const.EULER_COLS):
+            for i in range(const.EULER_PEDALS + 3):
                 self.__playing[-1].append(0)
         index_init = const.NOTE_NAMES.index(
             const.INIT_NAME
@@ -90,7 +90,7 @@ class Gui(tk.Frame):
         for j in range(const.EULER_ROWS):
             self.__dots_small.append([])
             self.__dots_big.append([])
-            for i in range(const.EULER_COLS):
+            for i in range(const.EULER_PEDALS + 3):
                 index = index_init - i_init + i - (j_init - j)*4
                 if (0 <= index < len(const.NOTE_NAMES)):
                     name = const.NOTE_NAMES[index]
@@ -141,7 +141,7 @@ class Gui(tk.Frame):
 
 
     def set_region(self, index):
-        for i in range(const.EULER_COLS - 3):
+        for i in range(const.EULER_PEDALS):
             if i == index:
                 value = tk.NORMAL
             else:
@@ -177,7 +177,7 @@ class Gui(tk.Frame):
 
     def reset(self):
         for j in range(const.EULER_ROWS):
-            for i in range(const.EULER_COLS):
+            for i in range(const.EULER_PEDAlS + 3):
                 self.__playing[j][i] = 0
                 self.__canvas.itemconfigure(
                     self.__dots_small[j][i],
