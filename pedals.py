@@ -43,9 +43,12 @@ def userInputTask(flag):
             flag[0] = 0
 
 def listeningTask(flag):
+    sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
+    numberOfLoopsUntilStandby = STANDBY_AFTER_SECONDS // ACTIVE_SLEEP_DURATION_IN_SECONDS + 1
+    standbyCounter = 0
     signalNotes = []
     while (flag[0]):
-        time.sleep(0.001)
+        somethingHappened = False
         now = time.time()
         if (len(signalNotes) > 0):
             if now > signalNotes[0]["time"] + 1.0:
@@ -59,6 +62,7 @@ def listeningTask(flag):
                 )
                 del signalNotes[0]
         if (arduino.inWaiting() > 0):
+            somethingHappened = True
             arduinoValue = arduino.read();
             if arduinoValue not in [b'\r', b'\n']:
                 midicode = table[arduinoValue]
@@ -73,15 +77,26 @@ def listeningTask(flag):
                 signalNotes.append({"note": midicode, "time": time.time()})
         message = midiInputPort.poll()
         if message:
+            somethingHappened = True
             if message.channel != CTRL_CHANNEL - 1:
                 midiOutputPort.send(message)
-            
+        if somethingHappened:
+            standbyCounter = 0
+            sleepDuration = ACTIVE_SLEEP_DURATION_IN_SECONDS
+        else:
+            standbyCounter += 1
+        if standbyCounter > numberOfLoopsUntilStandby:
+            sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
+        time.sleep(sleepDuration)   
 
-inputThread = threading.Thread(target=userInputTask, args=(flag,))
+if CONSOLE_IO:
+    inputThread = threading.Thread(target=userInputTask, args=(flag,))
 listeningThread = threading.Thread(target=listeningTask, args=(flag,))
-inputThread.start()
+if CONSOLE_IO:
+    inputThread.start()
 listeningThread.start()
-inputThread.join()
+if CONSOLE_IO:
+    inputThread.join()
 listeningThread.join()
 
 midiInputPort.close()

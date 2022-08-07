@@ -79,7 +79,6 @@ class Eulerizer:
                         self.__pressed[j, midi] = 1
                         self.__sounding[j, midi] = 1
                     else:
-    #                    print(self.__priority)
                         j = self.__priority.argmax()
                         self.__euli[j] = euli
                         self.__midi_connection \
@@ -92,11 +91,11 @@ class Eulerizer:
                         self.__priority[j] = 0
                         self.__pressed[j, midi] = 1
                         self.__sounding[j, midi] = 1
-    #                print(self.__priority)
-                        print(
-                            note_on_format_str%euli,
-                            flush=True
-                        )
+                        if CONSOLE_IO:
+                            print(
+                                note_on_format_str%euli,
+                                flush=True
+                            )
                 elif typ == "note_off":
                     midi = message.note
                     self.__pressed[:, midi] = 0
@@ -120,10 +119,11 @@ class Eulerizer:
                         if self.__sounding[j].sum() == 0:
                             self.__priority[j] = 10
                             self.__euli[j] = None
-                            print(
-                                note_off_format_str%euli,
-                                flush=True
-                            )
+                            if CONSOLE_IO:
+                                print(
+                                    note_off_format_str%euli,
+                                    flush=True
+                                )
                     self.__priority += (self.__priority >= 10)
  
     def setRegion(self, region):
@@ -133,7 +133,9 @@ class Eulerizer:
 
 if __name__ == "__main__":
 
-
+    sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
+    numberOfLoopsUntilStandby = STANDBY_AFTER_SECONDS // ACTIVE_SLEEP_DURATION_IN_SECONDS + 1
+    standbyCounter = 0
     eulerizers = []
     flag = [1]
     factorTwo = FACTOR_TWO
@@ -170,9 +172,10 @@ if __name__ == "__main__":
                         factorFive = float(words[2])
                         (eulis, bendings) = Calculator.Calculator()(PARAMS[i]["BENDING"], False, factorTwo, factorThree, factorFive, factorSeven)
                         eulerizers[i].setBendings(bendings)
-                    
-    userInputThread = threading.Thread(target=userInputTask, args=(flag, eulerizers, factorTwo, factorThree, factorFive))
-    userInputThread.start()
+
+    if CONSOLE_IO:
+        userInputThread = threading.Thread(target=userInputTask, args=(flag, eulerizers, factorTwo, factorThree, factorFive))
+        userInputThread.start()
 
     midi_connection = MidiConnection()
     for param in PARAMS:
@@ -197,8 +200,16 @@ if __name__ == "__main__":
                          if 0 <= region < 8:
                              for eulerizer in eulerizers:
                                  eulerizer.setRegion(region)
-                             print("region=%i"%(region), flush=True)
-        time.sleep(0.001)
+                             if CONSOLE_IO:
+                                 print("region=%i"%(region), flush=True)
+            standbyCounter = 0
+            sleepDuration = ACTIVE_SLEEP_DURATION_IN_SECONDS
+        else:
+            standbyCounter += 1
+        if standbyCounter > numberOfLoopsUntilStandby:
+            sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
+        time.sleep(sleepDuration)
 
-    print("quit", flush=True)
-    userInputThread.join() 
+    if CONSOLE_IO:
+        print("quit", flush=True)
+        userInputThread.join() 
