@@ -23,6 +23,7 @@ class Eulerizer:
         self.__in_channel = param["IN_CHANNEL"] - 1
         self.__channels = [c - 1 for c in param["CHANNELS"]]
         self.__bending = param["BENDING"]
+        self.__legato = param["LEGATO"]
         self.__midi_connection = midi_connection
         self.__region = 4
         self.reset()
@@ -69,6 +70,21 @@ class Eulerizer:
                         [self.__region][midi]
                     if euli in self.__euli and OCTAVES_SHARE_CHANNEL:
                         j = self.__euli.index(euli)
+                        self.__midi_connection \
+                            .start_note(
+                                midi,
+                                velocity,
+                                bending,
+                                self.__channels[j]
+                            )
+                        self.__pressed[j, midi] = 1
+                        self.__sounding[j, midi] = 1
+                    elif self.__legato and self.__sounding.sum() > 0:
+                        midi = message.note
+                        velocity = message.velocity
+                        euli = self.__eulis \
+                            [self.__region][midi]
+                        j = np.where(self.__sounding == 1)[0][0]
                         self.__midi_connection \
                             .start_note(
                                 midi,

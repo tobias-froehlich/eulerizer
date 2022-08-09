@@ -26,7 +26,8 @@ INIT_FREQ = 440.0
 INIT_MIDI = 57
 
 FACTOR_TWO = 2.00
-FACTOR_THREE = 3.0
+FACTOR_THREE = 3.00
+#FACTOR_FIVE = 5.0625 # pythogorean
 FACTOR_FIVE = 5.00
 FACTOR_SEVEN = 7.00
 
@@ -34,16 +35,55 @@ FACTOR_SEVEN = 7.00
 
 NO_BENDING = False
 
-OCTAVES_SHARE_CHANNEL = False
+OCTAVES_SHARE_CHANNEL = True
 
 CTRL_CHANNEL = 10
-PARAMS = [
+
+which_params = "piano"
+
+params_piano = [
     {   
         "IN_CHANNEL": 1,
         "CHANNELS": [2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16],
-        "BENDING": 2
+        "BENDING": 2,
+        "LEGATO": False,
     },
 ]
+params_4voices = [
+    {   
+        "IN_CHANNEL": 1,
+        "CHANNELS": [1, 2],
+        "BENDING": 2,
+        "LEGATO": True,
+    },
+    {   
+        "IN_CHANNEL": 2,
+        "CHANNELS": [3, 4],
+        "BENDING": 2,
+        "LEGATO": True,
+    },
+    {   
+        "IN_CHANNEL": 3,
+        "CHANNELS": [5, 6],
+        "BENDING": 2,
+        "LEGATO": True,
+    },
+    {   
+        "IN_CHANNEL": 4,
+        "CHANNELS": [7, 8],
+        "BENDING": 2,
+        "LEGATO": True,
+    },
+]
+
+
+def choose_params(which_params):
+    if which_params == "piano":
+        return params_piano
+    elif which_params == "4voices":
+        return params_4voices
+
+PARAMS = choose_params(which_params)
 
 NOTE_NAMES = [
     "fb", "cb", "gb", "db", "ab", "eb", "bb",
