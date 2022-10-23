@@ -94,53 +94,57 @@ class Gui(tk.Frame):
             self.__dots_small.append([])
             self.__dots_big.append([])
             for i in range(const.EULER_PEDALS + 3):
+                index = index_init - i_init + i - (j_init - j)*4
+                if (0 <= index < len(const.NOTE_NAMES)):
+                    name = const.NOTE_NAMES[index]
+
+                    image = tk.PhotoImage(
+                        file="figs/%s_small.png"%(name)
+                    )
+                else:
+                    image = tk.PhotoImage(
+                        file="figs/o_small.png"
+                    )
+                self.__images.append(image)
+                (x, y) = self.__euler_to_coords(
+                    i, j
+                )
                 if self.__note_exists_in_meantone_region(i, j):
-                    index = index_init - i_init + i - (j_init - j)*4
-                    if (0 <= index < len(const.NOTE_NAMES)):
-                        name = const.NOTE_NAMES[index]
-    
-                        image = tk.PhotoImage(
-                            file="figs/%s_small.png"%(name)
-                        )
-                    else:
-                        image = tk.PhotoImage(
-                            file="figs/o_small.png"
-                        )
-                    self.__images.append(image)
-                    (x, y) = self.__euler_to_coords(
-                        i, j
+                    state = tk.NORMAL
+                else:
+                    state = tk.HIDDEN
+                self.__dots_small[-1].append(
+                    self.__canvas.create_image(
+                        x,
+                        y,
+                        image=image,
+                        anchor=tk.CENTER,
+                        state=state
                     )
-                    self.__dots_small[-1].append(
-                        self.__canvas.create_image(
-                            x,
-                            y,
-                            image=image,
-                            anchor=tk.CENTER
-                        )
+                )
+                if (0 <= index < len(const.NOTE_NAMES)):
+                    name = const.NOTE_NAMES[index]
+
+                    image = tk.PhotoImage(
+                        file="figs/%s_big.png"%(name)
                     )
-                    if (0 <= index < len(const.NOTE_NAMES)):
-                        name = const.NOTE_NAMES[index]
-    
-                        image = tk.PhotoImage(
-                            file="figs/%s_big.png"%(name)
-                        )
-                    else:
-                        image = tk.PhotoImage(
-                            file="figs/o_big.png"
-                        )
-                    self.__images.append(image)
-                    (x, y) = self.__euler_to_coords(
-                        i, j
+                else:
+                    image = tk.PhotoImage(
+                        file="figs/o_big.png"
                     )
-                    self.__dots_big[-1].append(
-                        self.__canvas.create_image(
-                            x,
-                            y,
-                            image=image,
-                            anchor=tk.CENTER,
-                            state=tk.HIDDEN
-                        )
+                self.__images.append(image)
+                (x, y) = self.__euler_to_coords(
+                    i, j
+                )
+                self.__dots_big[-1].append(
+                    self.__canvas.create_image(
+                        x,
+                        y,
+                        image=image,
+                        anchor=tk.CENTER,
+                        state=tk.HIDDEN
                     )
+                )
 
     def __note_exists_in_meantone_region(self, i, j):
         return i < 4 and j >= 2 or 4 <= i <= 7 and 1 <= j <= 3 or i > 7 and j <= 2
