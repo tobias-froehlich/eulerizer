@@ -98,9 +98,9 @@ class Calculator:
             eulis = []
             for j in range(1, 4):
                 for i1 in range(4):
-                    if i > 7:
+                    if i + i1 > 7:
                         j_corrected = j - 1
-                    elif i < 4:
+                    elif i + i1 < 4:
                         j_corrected = j + 1
                     else:
                         j_corrected = j
