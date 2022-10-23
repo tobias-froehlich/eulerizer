@@ -39,29 +39,12 @@ class Calculator:
 
         self.__intonations = []
         self.__eulis = []
-        for i in range(const.EULER_PEDALS):
-            midis = []
-            freqs = []
-            eulis = []
-            for j in range(1, 4):
-                for i1 in range(4):
-                    midis.append(
-                        self.__midis[j][i+i1]
-                    )
-                    freqs.append(
-                        self.__freqs[j][i+i1]
-                    )
-                    eulis.append((i+i1, j))
-            self.__intonations.append([])
-            self.__eulis.append([])
-            for note in range(128):
-                self.__intonations[-1].append(
-                    freqs[midis.index(note%12)]
-                  * factorTwo ** (note // 12)
-                )
-                self.__eulis[-1].append(
-                    eulis[midis.index(note%12)]
-                )
+
+        assert const.REGION_MODE in ["HORIZONTAL", "MEANTONE"], "The REGION_MODE %s does not exist."%(const.REGION_MODE)
+        if const.REGION_MODE == "HORIZONTAL":
+            self.__make_intonations_without_7_horizontal(factorTwo, factorThree, factorFive)
+        elif const.REGION_MODE == "MEANTONE":
+            self.__make_intonations_without_7_meantone(factorTwo, factorThree, factorFive)
 
         self.__bendings = []
         self.__equal_freqs = []
@@ -82,6 +65,65 @@ class Calculator:
 
 
         return (self.__eulis, self.__bendings)
+
+    def __make_intonations_without_7_horizontal(self, factorTwo, factorThree, factorFive):
+        for i in range(const.EULER_PEDALS):
+            midis = []
+            freqs = []
+            eulis = []
+            for j in range(3):
+                for i1 in range(4):
+                    midis.append(
+                        self.__midis[j][i+i1]
+                    )
+                    freqs.append(
+                        self.__freqs[j][i+i1]
+                    )
+                    eulis.append((i+i1, j))
+            self.__intonations.append([])
+            self.__eulis.append([])
+            for note in range(128):
+                self.__intonations[-1].append(
+                    freqs[midis.index(note%12)]
+                  * factorTwo ** (note // 12)
+                )
+                self.__eulis[-1].append(
+                    eulis[midis.index(note%12)]
+                )
+
+    def __make_intonations_without_7_meantone(self, factorTwo, factorThree, factorFive):
+        for i in range(const.EULER_PEDALS):
+            midis = []
+            freqs = []
+            eulis = []
+            for j in range(1, 4):
+                for i1 in range(4):
+                    if i > 7:
+                        j_corrected = j - 1
+                    elif i < 4:
+                        j_corrected = j + 1
+                    else:
+                        j_corrected = j
+                    midis.append(
+                        self.__midis[j_corrected][i+i1]
+                    )
+                    freqs.append(
+                        self.__freqs[j_corrected][i+i1]
+                    )
+                    eulis.append((i+i1, j_corrected))
+            self.__intonations.append([])
+            self.__eulis.append([])
+            for note in range(128):
+                self.__intonations[-1].append(
+                    freqs[midis.index(note%12)]
+                  * factorTwo ** (note // 12)
+                )
+                self.__eulis[-1].append(
+                    eulis[midis.index(note%12)]
+                )
+
+
+
  
     def __calculate_with_7(self, bending, noBending, factorTwo, factorThree, factorFive, factorSeven):
         self.__midis = []
