@@ -53,7 +53,7 @@ class Gui(tk.Frame):
         ]
         print(self.__regions)
             
-        self.set_region(2)
+        self.set_region(4)
 
     def __make_region(self, coords):
         cartesianCoords = []
