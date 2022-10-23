@@ -41,36 +41,39 @@ class Gui(tk.Frame):
         self.__canvas.pack()
 
     def __make_regions(self):
-        self.__regions = []
-        for i in range(const.EULER_PEDALS):
-            (x0, y0) = self.__euler_to_coords(
-                i-0.5,
-                -0.5
-            )
-            (x1, y1) = self.__euler_to_coords(
-                i-0.5,
-                const.EULER_ROWS - 0.5
-            )
-            (x2, y2) = self.__euler_to_coords(
-                i+3.5,
-                const.EULER_ROWS - 0.5
-            )
-            (x3, y3) = self.__euler_to_coords(
-                i+3.5,
-                -0.5
-            )
-            self.__regions.append(
-                self.__canvas.create_polygon(
-                    x0, y0, x1, y1, x2, y2, x3, y3,
+        self.__regions = [
+            self.__make_region([-0.5, 1.5, -0.5, 4.5, 3.5, 4.5, 3.5, 1.5]),
+            self.__make_region([-0.5, 1.5, -0.5, 4.5, 2.5, 4.5, 2.5, 3.5, 3.5, 3.5, 3.5, 0.5, 2.5, 0.5, 2.5, 1.5]),
+            self.__make_region([ 0.5, 1.5,  0.5, 4.5, 2.5, 4.5, 2.5, 3.5, 4.5, 3.5, 4.5, 0.5, 2.5, 0.5, 2.5, 1.5]),
+            self.__make_region([ 1.5, 1.5,  1.5, 4.5, 2.5, 4.5, 2.5, 3.5, 5.5, 3.5, 5.5, 0.5, 2.5, 0.5, 2.5, 1.5]),
+            self.__make_region([ 3.5, 0.5,  3.5, 3.5, 7.5, 3.5, 7.5, 0.5]),
+            self.__make_region([ 3.5, 0.5,  3.5, 3.5, 6.5, 3.5, 6.5, 2.5, 7.5, 2.5, 7.5,-0.5, 6.5,-0.5, 6.5, 0.5]),
+            self.__make_region([ 4.5, 0.5,  4.5, 3.5, 6.5, 3.5, 6.5, 2.5, 8.5, 2.5, 8.5,-0.5, 6.5,-0.5, 6.5, 0.5]),
+            self.__make_region([ 5.5, 0.5,  5.5, 3.5, 6.5, 3.5, 6.5, 2.5, 9.5, 2.5, 9.5,-0.5, 6.5,-0.5, 6.5, 0.5]),
+        ]
+        print(self.__regions)
+            
+        self.set_region(7)
+
+    def __make_region(self, coords):
+        cartesianCoords = []
+        for i in range(len(coords)):
+            if i % 2 == 0:
+                x = coords[i]
+                y = coords[i+1]
+                (cartesianX, cartesianY) = self.__euler_to_coords(x, y)
+                cartesianCoords.append(cartesianX)
+                cartesianCoords.append(cartesianY)
+        return self.__canvas.create_polygon(
+                    *cartesianCoords,
                     fill=const.REGION_COLOR,
                     width=
                         const.REGION_BORDER_WIDTH,
                     outline=
                         const.REGION_BORDER_COLOR,
                     state=tk.HIDDEN
-                )
-            )
-        self.set_region(4)
+        )
+
 
     def __make_dots(self):
         self.__dots_small = []
