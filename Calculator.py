@@ -43,7 +43,7 @@ class Calculator:
             midis = []
             freqs = []
             eulis = []
-            for j in range(3):
+            for j in range(1, 4):
                 for i1 in range(4):
                     midis.append(
                         self.__midis[j][i+i1]
