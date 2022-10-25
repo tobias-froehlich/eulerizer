@@ -123,9 +123,9 @@ class Eulerizer:
                                     flush=True
                                 )
                 elif typ == "note_off":
+                    midi = message.note
                     if (self.__midiRange[0] <= midi <= self.__midiRange[1]):
                         midi += self.__transpose
-                        midi = message.note
                         self.__pressed[:, midi] = 0
     
                 if not self.__pedal_pressed:
