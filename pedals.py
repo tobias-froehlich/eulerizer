@@ -39,6 +39,7 @@ table = {
 def userInputTask(flag):
     while (flag[0]):
         userInput = input("Enter \"quit\":\n")
+        print(userInput)
         if userInput == "quit":
             flag[0] = 0
 

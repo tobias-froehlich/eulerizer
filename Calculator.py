@@ -5,9 +5,9 @@ import const
 class Calculator:
 
     def __call__(self, bending, noBending, factorTwo, factorThree, factorFive, factorSeven):
-        if const.USE_SEVEN:
+        if const.EULER_NET == "STANDARD7":
             return self.__calculate_with_7(bending, noBending, factorTwo, factorThree, factorFive, factorSeven)
-        else:
+        elif const.EULER_NET in ["STANDARD", "MEANTONE"]:
             return self.__calculate_without_7(bending, noBending, factorTwo, factorThree, factorFive)
 
     def __calculate_without_7(self, bending, noBending, factorTwo, factorThree, factorFive):
@@ -40,10 +40,10 @@ class Calculator:
         self.__intonations = []
         self.__eulis = []
 
-        assert const.REGION_MODE in ["HORIZONTAL", "MEANTONE"], "The REGION_MODE %s does not exist."%(const.REGION_MODE)
-        if const.REGION_MODE == "HORIZONTAL":
+        assert const.EULER_NET in ["STANDARD", "MEANTONE"], "The REGION_MODE %s does not exist."%(const.REGION_MODE)
+        if const.EULER_NET == "STANDARD":
             self.__make_intonations_without_7_horizontal(factorTwo, factorThree, factorFive)
-        elif const.REGION_MODE == "MEANTONE":
+        elif const.EULER_NET == "MEANTONE":
             self.__make_intonations_without_7_meantone(factorTwo, factorThree, factorFive)
 
         self.__bendings = []

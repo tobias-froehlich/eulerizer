@@ -5,10 +5,10 @@ import time
 import threading
 from const import *
 
-if USE_SEVEN:
+if EULER_NET in ["STANDARD", "MEANTONE"]:
     note_on_format_str = "note_on=%i,%i,%i"
     note_off_format_str = "note_off=%i,%i,%i"
-else:
+elif EULER_NET == "STANDARD7":
     note_on_format_str = "note_on=%i,%i"
     note_off_format_str = "note_off=%i,%i"
 
