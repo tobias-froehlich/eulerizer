@@ -24,6 +24,14 @@ class Eulerizer:
         self.__channels = [c - 1 for c in param["CHANNELS"]]
         self.__bending = param["BENDING"]
         self.__legato = param["LEGATO"]
+        if "MIDI_RANGE" in param.keys():
+            self.__midiRange = param["MIDI_RANGE"]
+        else:
+            self.__midiRange = [0, 127]
+        if "TRANSPOSE" in param.keys():
+            self.__transpose = param["TRANSPOSE"]
+        else:
+            self.__transpose = 0
         self.__midi_connection = midi_connection
         self.__region = 4
         self.reset()
@@ -63,58 +71,62 @@ class Eulerizer:
                             self.__pedal_pressed = False
                 if typ == "note_on":
                     midi = message.note
-                    velocity = message.velocity
-                    euli = self.__eulis \
-                        [self.__region][midi]
-                    bending = self.__bendings \
-                        [self.__region][midi]
-                    if euli in self.__euli and OCTAVES_SHARE_CHANNEL:
-                        j = self.__euli.index(euli)
-                        self.__midi_connection \
-                            .start_note(
-                                midi,
-                                velocity,
-                                bending,
-                                self.__channels[j]
-                            )
-                        self.__pressed[j, midi] = 1
-                        self.__sounding[j, midi] = 1
-                    elif self.__legato and self.__sounding.sum() > 0:
-                        midi = message.note
+                    if (self.__midiRange[0] <= midi <= self.__midiRange[1]):
+                        midi += self.__transpose
                         velocity = message.velocity
                         euli = self.__eulis \
                             [self.__region][midi]
-                        j = np.where(self.__sounding == 1)[0][0]
-                        self.__midi_connection \
-                            .start_note(
-                                midi,
-                                velocity,
-                                bending,
-                                self.__channels[j]
-                            )
-                        self.__pressed[j, midi] = 1
-                        self.__sounding[j, midi] = 1
-                    else:
-                        j = self.__priority.argmax()
-                        self.__euli[j] = euli
-                        self.__midi_connection \
-                            .start_note(
-                                midi,
-                                velocity,
-                                bending,
-                                self.__channels[j]
-                            )
-                        self.__priority[j] = 0
-                        self.__pressed[j, midi] = 1
-                        self.__sounding[j, midi] = 1
-                        if CONSOLE_IO:
-                            print(
-                                note_on_format_str%euli,
-                                flush=True
-                            )
+                        bending = self.__bendings \
+                            [self.__region][midi]
+                        if euli in self.__euli and OCTAVES_SHARE_CHANNEL:
+                            j = self.__euli.index(euli)
+                            self.__midi_connection \
+                                .start_note(
+                                    midi,
+                                    velocity,
+                                    bending,
+                                    self.__channels[j]
+                                )
+                            self.__pressed[j, midi] = 1
+                            self.__sounding[j, midi] = 1
+                        elif self.__legato and self.__sounding.sum() > 0:
+                            midi = message.note
+                            velocity = message.velocity
+                            euli = self.__eulis \
+                                [self.__region][midi]
+                            j = np.where(self.__sounding == 1)[0][0]
+                            self.__midi_connection \
+                                .start_note(
+                                    midi,
+                                    velocity,
+                                    bending,
+                                    self.__channels[j]
+                                )
+                            self.__pressed[j, midi] = 1
+                            self.__sounding[j, midi] = 1
+                        else:
+                            j = self.__priority.argmax()
+                            self.__euli[j] = euli
+                            self.__midi_connection \
+                                .start_note(
+                                    midi,
+                                    velocity,
+                                    bending,
+                                    self.__channels[j]
+                                )
+                            self.__priority[j] = 0
+                            self.__pressed[j, midi] = 1
+                            self.__sounding[j, midi] = 1
+                            if CONSOLE_IO:
+                                print(
+                                    note_on_format_str%euli,
+                                    flush=True
+                                )
                 elif typ == "note_off":
-                    midi = message.note
-                    self.__pressed[:, midi] = 0
+                    if (self.__midiRange[0] <= midi <= self.__midiRange[1]):
+                        midi += self.__transpose
+                        midi = message.note
+                        self.__pressed[:, midi] = 0
     
                 if not self.__pedal_pressed:
                     sounding_but_not_pressed = \

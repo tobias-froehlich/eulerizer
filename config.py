@@ -27,6 +27,8 @@ PARAMS = [
         "CHANNELS": [2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16],
         "BENDING": 2,
         "LEGATO": False,
+        "MIDI_RANGE": [0, 59],
+        "TRANSPOSE": 12,
     },
 ]
 
