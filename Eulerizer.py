@@ -90,7 +90,6 @@ class Eulerizer:
                             self.__pressed[j, midi] = 1
                             self.__sounding[j, midi] = 1
                         elif self.__legato and self.__sounding.sum() > 0:
-                            midi = message.note
                             velocity = message.velocity
                             euli = self.__eulis \
                                 [self.__region][midi]
