@@ -10,13 +10,11 @@ class MidiConnection:
             client_name="eulerizer",
             virtual=True
         )
-        self.__ports_out = []
-        for i in range(16):
-            mido.open_output(
-                name="eulerizer%0i"%(i),
-                client_name="eulerizer",
-                virtual=True
-            )
+        self.__port_out = mido.open_output(
+            name="eulerizer",
+            client_name="eulerizer",
+            virtual=True
+        )
 
 
     def get_message(self):
@@ -24,24 +22,24 @@ class MidiConnection:
 
     def start_note(self, midi,
             velocity, bending, channel):
-        self.__ports_out[channel].send(
+        self.__port_out.send(
             mido.Message(
                 "pitchwheel",
-                channel=0,
+                channel=channel,
                 pitch=int(round(bending * 8191))
             )
         )
-        self.__ports_out[channel].send(
+        self.__port_out.send(
             mido.Message(
                 "note_on",
-                channel=0,
+                channel=channel,
                 note=midi,
                 velocity=velocity
             )
         )
 
     def stop_note(self, midi, channel):
-        self.__ports_out[channel].send(
+        self.__port_out.send(
             mido.Message(
                 "note_off",
                 channel=channel,
@@ -49,10 +47,10 @@ class MidiConnection:
             )
         )
 
-#    def send_through(self, message):
-#        self.__port_out.send(
-#            message
-#        )
+    def send_through(self, message):
+        self.__port_out.send(
+            message
+        )
 
     def send_stop_signal(self):
         self.__port_out.panic()
