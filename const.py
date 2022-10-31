@@ -1,4 +1,14 @@
-from config import *
+import sys
+import os
+
+assert len(sys.argv) == 2, "You must give one parameter: The config file."
+assert not sys.argv[1].endswith(".py"), "Omit the file ending '.py' from the config file name."
+(configPath, configFilename) = os.path.split(sys.argv[1])
+sys.path.append(configPath)
+config = __import__(configFilename)
+globals().update(config.__dict__)
+
+
 
 EULERNET_DISTANCE = 90
 LETTER_SIZE = (80, 80)

@@ -5,7 +5,6 @@ from Eulerizer import Eulerizer
 import time
 import threading
 from const import *
-        
 
 sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
 numberOfLoopsUntilStandby = STANDBY_AFTER_SECONDS // ACTIVE_SLEEP_DURATION_IN_SECONDS + 1
