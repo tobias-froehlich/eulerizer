@@ -26,17 +26,13 @@ def task():
         gui.set_region(int(words[1]))
         root.after(1, task)
     elif words[0] == "note_on":
-        subwords = words[1].split(",")
         gui.note_on(
-            int(subwords[0]),
-            int(subwords[1])
+            words[1]
         )
         root.after(1, task)
     elif words[0] == "note_off":
-        subwords = words[1].split(",")
         gui.note_off(
-            int(subwords[0]),
-            int(subwords[1])
+            words[1]
         )
         root.after(1, task)
     elif words[0] == "reset":

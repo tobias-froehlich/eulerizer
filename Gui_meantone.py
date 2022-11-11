@@ -161,7 +161,8 @@ class Gui(tk.Frame):
                 state=value
             )
 
-    def note_on(self, i, j):
+    def note_on(self, position):
+        [i, j] = [int(word) for word in position.split(",")]
         self.__playing[j][i] += 1
         if self.__playing[j][i] > 0:
             self.__canvas.itemconfigure(
@@ -173,7 +174,8 @@ class Gui(tk.Frame):
                 state=tk.NORMAL
             )
 
-    def note_off(self, i, j):
+    def note_off(self, position):
+        [i, j] = [int(word) for word in position.split(",")]
         self.__playing[j][i] -= 1
         if self.__playing[j][i] == 0:
             self.__canvas.itemconfigure(
