@@ -5,7 +5,7 @@ STANDBY_AFTER_SECONDS = 20
 
 EULER_NET = "MEANTONE"
 
-INIT_POS = (5, 2, 0)
+INIT_POS = (6, 2, 0)
 
 INIT_NAME = "a"
 INIT_FREQ = 440.0
@@ -17,18 +17,26 @@ FACTOR_FIVE = 5.00
 FACTOR_SEVEN = 7.00
 
 
-OCTAVES_SHARE_CHANNEL = True
+OCTAVES_SHARE_CHANNEL = False
 
 CTRL_CHANNEL = 10
 
 PARAMS = [
     {   
         "IN_CHANNEL": 1,
-        "CHANNELS": [2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16],
+        "CHANNELS": [1, 2, 3, 4, 5, 6, 7, 8],
         "BENDING": 2,
         "LEGATO": False,
         "MIDI_RANGE": [0, 59],
-        "TRANSPOSE": 12,
+        "TRANSPOSE": 0,
+    },
+    {   
+        "IN_CHANNEL": 1,
+        "CHANNELS": [9, 11, 12, 13, 14, 15, 16],
+        "BENDING": 2,
+        "LEGATO": False,
+        "MIDI_RANGE": [60, 127],
+        "TRANSPOSE": -12,
     },
 ]
 
