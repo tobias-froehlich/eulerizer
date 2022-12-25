@@ -5,16 +5,17 @@ STANDBY_AFTER_SECONDS = 20
 
 EULER_NET = "STANDARD7"
 
-INIT_POS = (6, 2, 0)
+INIT_POS = (4, 1, 0)
 
 INIT_NAME = "a"
 INIT_FREQ = 440.0
 INIT_MIDI = 57
 
-FACTOR_TWO = 2.00
-FACTOR_THREE = 3.00
-FACTOR_FIVE = 5.00
-FACTOR_SEVEN = 7.00
+exponent = 0.96875
+FACTOR_TWO = 2.00**exponent
+FACTOR_THREE = 3.00**exponent
+FACTOR_FIVE = 5.00**exponent
+FACTOR_SEVEN = 7.00**exponent
 
 
 OCTAVES_SHARE_CHANNEL = False
@@ -27,6 +28,7 @@ PARAMS = [
         "CHANNELS": [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16],
         "BENDING": 2,
         "LEGATO": False,
+        "TRANSPOSE": 0,
     },
 ]
 
