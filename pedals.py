@@ -2,7 +2,30 @@ import serial
 import time
 import threading
 import mido
-from const import *
+import sys
+import os
+from const import updateConst
+
+
+const = {} # never dereference!
+
+updateConst(const, "standard")
+
+configDirectory = sys.argv[1]
+
+def getConfigs():
+    filenames = os.listdir(configDirectory)
+    filenames.sort()
+    configs = []
+    index = 1
+    for filename in filenames:
+        if filename.endswith(".py"):
+            configs.append({
+                "index": index,
+                "filename": filename[:-3],
+            })
+            index += 1
+    return configs
 
 arduino = serial.Serial(
     "/dev/ttyUSB0",
@@ -36,67 +59,84 @@ table = {
 
 
 
-def userInputTask(flag):
+def userInputTask(flag, const):
     while (flag[0]):
-        userInput = input("Enter \"quit\":\n")
+        configs = getConfigs()
+        print("print")
+        for c in configs:
+            print("print %2i: %s"%(c["index"], c["filename"]))
+        print("print")
+        userInput = input("Enter \"quit\" or the number of a configuration.:\n")
         print(userInput)
         if userInput == "quit":
             flag[0] = 0
+        else:
+            try:
+                number = int(userInput)
+                if not 1 <= number <= len(configs):
+                    print("print The input must be between 1 and %i"%(len(configs)))
+                else:
+                    for c in configs:
+                        if c["index"] == number:
+                            updateConst(const, c["filename"])
+                            print("config %s"%(c["filename"]))
+            except:
+                print("print Invalid input.")
 
-def listeningTask(flag):
-    sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
-    numberOfLoopsUntilStandby = STANDBY_AFTER_SECONDS // ACTIVE_SLEEP_DURATION_IN_SECONDS + 1
+def listeningTask(flag, const):
+    sleepDuration = const["STANDBY_SLEEP_DURATION_IN_SECONDS"]
     standbyCounter = 0
     signalNotes = []
     while (flag[0]):
-        somethingHappened = False
-        now = time.time()
-        if (len(signalNotes) > 0):
-            if now > signalNotes[0]["time"] + 1.0:
-                midiOutputPort.send(
-                    mido.Message(
-                        "note_off",
-                        channel=CTRL_CHANNEL - 1,
-                        note=signalNotes[0]["note"],
-                        velocity=0,
+        if "RUN" in const.keys():
+            somethingHappened = False
+            now = time.time()
+            if (len(signalNotes) > 0):
+                if now > signalNotes[0]["time"] + 1.0:
+                    midiOutputPort.send(
+                        mido.Message(
+                            "note_off",
+                            channel=const["CTRL_CHANNEL"] - 1,
+                            note=signalNotes[0]["note"],
+                            velocity=0,
+                        )
                     )
-                )
-                del signalNotes[0]
-        if (arduino.inWaiting() > 0):
-            somethingHappened = True
-            arduinoValue = arduino.read();
-            if arduinoValue not in [b'\r', b'\n']:
-                midicode = table[arduinoValue]
-                midiOutputPort.send(
-                    mido.Message(
-                        "note_on",
-                        channel=CTRL_CHANNEL - 1,
-                        note=midicode,
-                        velocity=100,
+                    del signalNotes[0]
+            if (arduino.inWaiting() > 0):
+                somethingHappened = True
+                arduinoValue = arduino.read();
+                if arduinoValue not in [b'\r', b'\n']:
+                    midicode = table[arduinoValue]
+                    midiOutputPort.send(
+                        mido.Message(
+                            "note_on",
+                            channel=CTRL_CHANNEL - 1,
+                            note=midicode,
+                            velocity=100,
+                        )
                     )
-                )
-                signalNotes.append({"note": midicode, "time": time.time()})
-        message = midiInputPort.poll()
-        if message:
-            somethingHappened = True
-            if message.channel != CTRL_CHANNEL - 1:
-                midiOutputPort.send(message)
-        if somethingHappened:
-            standbyCounter = 0
-            sleepDuration = ACTIVE_SLEEP_DURATION_IN_SECONDS
-        else:
-            standbyCounter += 1
-        if standbyCounter > numberOfLoopsUntilStandby:
-            sleepDuration = STANDBY_SLEEP_DURATION_IN_SECONDS
-        time.sleep(sleepDuration)   
+                    signalNotes.append({"note": midicode, "time": time.time()})
+            message = midiInputPort.poll()
+            if message:
+                somethingHappened = True
+                if message.channel != const["CTRL_CHANNEL"] - 1:
+                    midiOutputPort.send(message)
+            if somethingHappened:
+                standbyCounter = 0
+                sleepDuration = const["ACTIVE_SLEEP_DURATION_IN_SECONDS"]
+            else:
+                standbyCounter += 1
+            if standbyCounter > const["NUMBER_OF_LOOPS_UNTIL_STANDBY"]:
+                sleepDuration = const["STANDBY_SLEEP_DURATION_IN_SECONDS"]
+            time.sleep(sleepDuration)   
 
-if CONSOLE_IO:
-    inputThread = threading.Thread(target=userInputTask, args=(flag,))
-listeningThread = threading.Thread(target=listeningTask, args=(flag,))
-if CONSOLE_IO:
+if const["CONSOLE_IO"]:
+    inputThread = threading.Thread(target=userInputTask, args=(flag, const))
+listeningThread = threading.Thread(target=listeningTask, args=(flag, const))
+if const["CONSOLE_IO"]:
     inputThread.start()
 listeningThread.start()
-if CONSOLE_IO:
+if const["CONSOLE_IO"]:
     inputThread.join()
 listeningThread.join()
 

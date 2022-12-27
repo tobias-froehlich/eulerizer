@@ -1,25 +1,28 @@
 import numpy as np
+import const
 from MidiConnection import MidiConnection
 import Calculator
 import time
 import threading
 from const import *
 
-if EULER_NET in ["STANDARD", "MEANTONE"]:
-    note_on_format_str = "note_on=%i,%i"
-    note_off_format_str = "note_off=%i,%i"
-elif EULER_NET == "STANDARD7":
-    note_on_format_str = "note_on=%i,%i,%i"
-    note_off_format_str = "note_off=%i,%i,%i"
 
 
 class Eulerizer:
 
     def __init__(self, midi_connection, eulis,
-        bendings, param):
+        bendings, param, eulerNet, noBending):
         (self.__eulis, self.__bendings) = \
             (eulis, bendings)
-        self.__noBending = NO_BENDING
+
+        if eulerNet in ["STANDARD", "MEANTONE"]:
+            self.__note_on_format_str = "note_on=%i,%i"
+            self.__note_off_format_str = "note_off=%i,%i"
+        elif eulerNet == "STANDARD7":
+            self.__note_on_format_str = "note_on=%i,%i,%i"
+            self.__note_off_format_str = "note_off=%i,%i,%i"
+
+        self.__noBending = noBending
         self.__in_channel = param["IN_CHANNEL"] - 1
         self.__channels = [c - 1 for c in param["CHANNELS"]]
         self.__bending = param["BENDING"]
@@ -118,7 +121,7 @@ class Eulerizer:
                             self.__sounding[j, midi] = 1
                             if CONSOLE_IO:
                                 print(
-                                    note_on_format_str%euli,
+                                    self.__note_on_format_str%euli,
                                     flush=True
                                 )
                 elif typ == "note_off":
@@ -148,7 +151,7 @@ class Eulerizer:
                             self.__euli[j] = None
                             if CONSOLE_IO:
                                 print(
-                                    note_off_format_str%euli,
+                                    self.__note_off_format_str%euli,
                                     flush=True
                                 )
                     self.__priority += (self.__priority >= 10)
