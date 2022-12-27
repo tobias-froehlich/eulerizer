@@ -74,7 +74,7 @@ for param in const["PARAMS"]:
         const["FACTOR_FIVE"],
         const["FACTOR_SEVEN"]
     )
-    eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param, const["EULER_NET"], const["NO_BENDING"]))
+    eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param, const["EULER_NET"], const["NO_BENDING"], const["CONSOLE_IO"]))
 while flag[0]:
     message = midi_connection.get_message()
     if "RUN" in const.keys():

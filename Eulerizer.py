@@ -1,17 +1,15 @@
 import numpy as np
-import const
 from MidiConnection import MidiConnection
 import Calculator
 import time
 import threading
-from const import *
 
 
 
 class Eulerizer:
 
     def __init__(self, midi_connection, eulis,
-        bendings, param, eulerNet, noBending):
+        bendings, param, eulerNet, noBending, consoleIo):
         (self.__eulis, self.__bendings) = \
             (eulis, bendings)
 
@@ -23,6 +21,7 @@ class Eulerizer:
             self.__note_off_format_str = "note_off=%i,%i,%i"
 
         self.__noBending = noBending
+        self.__consoleIo = consoleIo
         self.__in_channel = param["IN_CHANNEL"] - 1
         self.__channels = [c - 1 for c in param["CHANNELS"]]
         self.__bending = param["BENDING"]
@@ -119,7 +118,7 @@ class Eulerizer:
                             self.__priority[j] = 0
                             self.__pressed[j, midi] = 1
                             self.__sounding[j, midi] = 1
-                            if CONSOLE_IO:
+                            if self.__consoleIo:
                                 print(
                                     self.__note_on_format_str%euli,
                                     flush=True
@@ -149,7 +148,7 @@ class Eulerizer:
                         if self.__sounding[j].sum() == 0:
                             self.__priority[j] = 10
                             self.__euli[j] = None
-                            if CONSOLE_IO:
+                            if self.__consoleIo:
                                 print(
                                     self.__note_off_format_str%euli,
                                     flush=True
