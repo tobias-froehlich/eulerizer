@@ -9,7 +9,7 @@ import threading
 class Eulerizer:
 
     def __init__(self, midi_connection, eulis,
-        bendings, param, eulerNet, noBending, consoleIo):
+        bendings, param, eulerNet, noBending, consoleIo, octavesShareChannel):
         (self.__eulis, self.__bendings) = \
             (eulis, bendings)
 
@@ -22,6 +22,7 @@ class Eulerizer:
 
         self.__noBending = noBending
         self.__consoleIo = consoleIo
+        self.__octavesShareChannel = octavesShareChannel
         self.__in_channel = param["IN_CHANNEL"] - 1
         self.__channels = [c - 1 for c in param["CHANNELS"]]
         self.__bending = param["BENDING"]
@@ -80,7 +81,7 @@ class Eulerizer:
                             [self.__region][midi]
                         bending = self.__bendings \
                             [self.__region][midi]
-                        if euli in self.__euli and OCTAVES_SHARE_CHANNEL:
+                        if euli in self.__euli and self.__octavesShareChannel:
                             j = self.__euli.index(euli)
                             self.__midi_connection \
                                 .start_note(

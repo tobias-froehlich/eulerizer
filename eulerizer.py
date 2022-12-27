@@ -57,6 +57,19 @@ def userInputTask(flag, eulerizers, factorTwo, factorThree, factorFive):
                     eulerizers[i].setBendings(bendings)
         elif words[0] == "config":
             updateConst(const, words[1])
+            eulerizers.clear()
+            for param in const["PARAMS"]:
+                (eulis, bendings) = Calculator.Calculator()(
+                    const,
+                    param["BENDING"],
+                    const["NO_BENDING"],
+                    const["FACTOR_TWO"],
+                    const["FACTOR_THREE"],
+                    const["FACTOR_FIVE"],
+                    const["FACTOR_SEVEN"]
+                )
+                eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param, const["EULER_NET"], const["NO_BENDING"], const["CONSOLE_IO"], const["OCTAVES_SHARE_CHANNEL"]))
+            print("print=%s"%(const))
             print("config=%s"%(words[1]))
 
 if const["CONSOLE_IO"]:
@@ -74,7 +87,7 @@ for param in const["PARAMS"]:
         const["FACTOR_FIVE"],
         const["FACTOR_SEVEN"]
     )
-    eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param, const["EULER_NET"], const["NO_BENDING"], const["CONSOLE_IO"]))
+    eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param, const["EULER_NET"], const["NO_BENDING"], const["CONSOLE_IO"], const["OCTAVES_SHARE_CHANNEL"]))
 while flag[0]:
     message = midi_connection.get_message()
     if "RUN" in const.keys():

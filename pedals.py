@@ -110,7 +110,7 @@ def listeningTask(flag, const):
                     midiOutputPort.send(
                         mido.Message(
                             "note_on",
-                            channel=CTRL_CHANNEL - 1,
+                            channel=const["CTRL_CHANNEL"] - 1,
                             note=midicode,
                             velocity=100,
                         )
