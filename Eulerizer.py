@@ -91,7 +91,7 @@ class Eulerizer:
                                     self.__channels[j]
                                 )
                             self.__pressed[j, midi] = 1
-                            self.__sounding[j, midi] = 1
+                            self.__sounding[j, midi] += 1
                         elif self.__legato and self.__sounding.sum() > 0:
                             velocity = message.velocity
                             euli = self.__eulis \
@@ -105,7 +105,7 @@ class Eulerizer:
                                     self.__channels[j]
                                 )
                             self.__pressed[j, midi] = 1
-                            self.__sounding[j, midi] = 1
+                            self.__sounding[j, midi] += 1
                         else:
                             j = self.__priority.argmax()
                             self.__euli[j] = euli
@@ -118,7 +118,7 @@ class Eulerizer:
                                 )
                             self.__priority[j] = 0
                             self.__pressed[j, midi] = 1
-                            self.__sounding[j, midi] = 1
+                            self.__sounding[j, midi] += 1
                             if self.__consoleIo:
                                 print(
                                     self.__note_on_format_str%euli,
@@ -139,12 +139,13 @@ class Eulerizer:
                     for ji in jis:
                         j = ji[0]
                         i = ji[1]
+                        for n in range(self.__sounding[j, i]):
+                            self.__midi_connection \
+                                .stop_note(
+                                    i,
+                                    self.__channels[j]
+                                )
                         self.__sounding[j, i] = 0
-                        self.__midi_connection \
-                            .stop_note(
-                                i,
-                                self.__channels[j]
-                            )
                         euli = self.__euli[j]
                         if self.__sounding[j].sum() == 0:
                             self.__priority[j] = 10
