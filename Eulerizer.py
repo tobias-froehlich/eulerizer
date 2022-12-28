@@ -52,7 +52,7 @@ class Eulerizer:
         self.__priority = np.zeros(
             len(self.__channels),
             dtype="int32"
-        ) + 100
+        ) + 1000
         self.__euli = [None]*len(self.__channels)
 
 
@@ -108,6 +108,17 @@ class Eulerizer:
                             self.__sounding[j, midi] += 1
                         else:
                             j = self.__priority.argmax()
+                            if self.__priority[j] < 100:
+                                print("print=%s"%("Caution! Notes have to be stopped because you do not have enough channels!"))
+                                soundingMidis = np.argwhere(self.__sounding[j] > 0)
+                                for m in soundingMidis[0]:
+                                    for n in range(self.__sounding[j, m]):
+                                        self.__midi_connection \
+                                            .stop_note(
+                                                m,
+                                                self.__channels[j]
+                                            )
+                                    self.__sounding[j, m] = 0
                             self.__euli[j] = euli
                             self.__midi_connection \
                                 .start_note(
@@ -132,7 +143,7 @@ class Eulerizer:
     
                 if not self.__pedal_pressed:
                     sounding_but_not_pressed = \
-                        self.__sounding - self.__pressed
+                        np.logical_and(self.__sounding > 0, self.__pressed == 0)
                     jis = np.argwhere(
                         sounding_but_not_pressed
                     )
@@ -148,15 +159,14 @@ class Eulerizer:
                         self.__sounding[j, i] = 0
                         euli = self.__euli[j]
                         if self.__sounding[j].sum() == 0:
-                            self.__priority[j] = 10
+                            self.__priority[j] = 100
                             self.__euli[j] = None
                             if self.__consoleIo:
                                 print(
                                     self.__note_off_format_str%euli,
                                     flush=True
                                 )
-                    self.__priority += (self.__priority >= 10)
- 
+                self.__priority += 1
     def setRegion(self, region):
         self.__region = region
 
