@@ -111,7 +111,7 @@ class Eulerizer:
                             if self.__priority[j] < 100:
                                 print("print=%s"%("Caution! Notes have to be stopped because you do not have enough channels!"))
                                 soundingMidis = np.argwhere(self.__sounding[j] > 0)
-                                for m in soundingMidis[0]:
+                                for m in soundingMidis[:, 0]:
                                     for n in range(self.__sounding[j, m]):
                                         self.__midi_connection \
                                             .stop_note(
