@@ -13,7 +13,7 @@ def updateConst(const, configFilename):
 
     const.clear()
 
-    
+    const["CONFIG_FILENAME"] = configFilename
     const["ACTIVE_SLEEP_DURATION_IN_SECONDS"] = ACTIVE_SLEEP_DURATION_IN_SECONDS
     const["STANDBY_SLEEP_DURATION_IN_SECONDS"] = STANDBY_SLEEP_DURATION_IN_SECONDS
     const["STANDBY_AFTER_SECONDS"] = STANDBY_AFTER_SECONDS

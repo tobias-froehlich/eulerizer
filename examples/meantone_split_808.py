@@ -23,7 +23,7 @@ CTRL_CHANNEL = 10
 PARAMS = [
     {   
         "IN_CHANNEL": 1,
-        "CHANNELS": [ 1, 2],
+        "CHANNELS": [ 1, 2, 3, 4],
         "BENDING": 12,
         "LEGATO": False,
         "MIDI_RANGE": [0, 62],
@@ -31,7 +31,7 @@ PARAMS = [
     },
     {   
         "IN_CHANNEL": 1,
-        "CHANNELS": [3, 4],
+        "CHANNELS": [5, 6, 7, 8],
         "BENDING": 12,
         "LEGATO": False,
         "MIDI_RANGE": [63, 127],

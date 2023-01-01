@@ -69,7 +69,6 @@ def userInputTask(flag, eulerizers, factorTwo, factorThree, factorFive):
                     const["FACTOR_SEVEN"]
                 )
                 eulerizers.append(Eulerizer(midi_connection, eulis, bendings, param, const["EULER_NET"], const["NO_BENDING"], const["CONSOLE_IO"], const["OCTAVES_SHARE_CHANNEL"]))
-            print("print=%s"%(const))
             print("config=%s"%(words[1]))
 
 if const["CONSOLE_IO"]:

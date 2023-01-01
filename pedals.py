@@ -57,17 +57,17 @@ table = {
     b'7': 63,
 }
 
-configFilename = "standard"
-
 def userInputTask(flag, const):
     while (flag[0]):
         configs = getConfigs()
+        print("print \033c")
         print("print")
         for c in configs:
             print("print %2i: %s"%(c["index"], c["filename"]))
         print("print")
-        print("print *** %s ***"%(configFilename))
-        userInput = input("Enter \"quit\" or the number of a configuration.:\n")
+        print("print *** %s ***"%(const["CONFIG_FILENAME"]))
+        print("print")
+        userInput = input("print=Enter \"quit\" or the number of a configuration.:\n")
         print(userInput)
         if userInput == "quit":
             flag[0] = 0
@@ -81,7 +81,6 @@ def userInputTask(flag, const):
                         if c["index"] == number:
                             updateConst(const, c["filename"])
                             print("config %s"%(c["filename"]))
-                            configFilename = c["filename"]
             except:
                 print("print Invalid input.")
 
