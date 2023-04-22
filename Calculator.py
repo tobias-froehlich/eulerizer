@@ -137,7 +137,7 @@ class Calculator:
                 self.__freqs[-1].append([])
                 for i in range(const["EULER_PEDALS"] + 1):
                     self.__midis[-1][-1].append(
-                        const.INIT_MIDI
+                        const["INIT_MIDI"]
                       + (i - const["INIT_POS"][0]) * 7
                       + (j - const["INIT_POS"][1]) * 4
                       + (k - const["INIT_POS"][2]) * 10
