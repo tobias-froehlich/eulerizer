@@ -27,10 +27,14 @@ def getConfigs():
             index += 1
     return configs
 
-arduino = serial.Serial(
-    "/dev/ttyUSB0",
-    9600
-)
+arduino = None
+try:
+    arduino = serial.Serial(
+        "/dev/ttyUSB0",
+        9600
+    )
+except:
+    print("Use without pedals.")
 
 flag = [1,]
 
@@ -60,7 +64,7 @@ table = {
 def userInputTask(flag, const):
     while (flag[0]):
         configs = getConfigs()
-        print("print \033c")
+#        print("print \033c")
         print("print")
         for c in configs:
             print("print %2i: %s"%(c["index"], c["filename"]))
@@ -133,13 +137,16 @@ def listeningTask(flag, const):
 
 if const["CONSOLE_IO"]:
     inputThread = threading.Thread(target=userInputTask, args=(flag, const))
-listeningThread = threading.Thread(target=listeningTask, args=(flag, const))
+if arduino:
+    listeningThread = threading.Thread(target=listeningTask, args=(flag, const))
 if const["CONSOLE_IO"]:
     inputThread.start()
-listeningThread.start()
+if arduino:
+    listeningThread.start()
 if const["CONSOLE_IO"]:
     inputThread.join()
-listeningThread.join()
+if arduino:
+    listeningThread.join()
 
 midiInputPort.close()
 midiOutputPort.close()
