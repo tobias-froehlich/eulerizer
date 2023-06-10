@@ -75,6 +75,10 @@ def userInputTask(flag, const):
         print(userInput)
         if userInput == "quit":
             flag[0] = 0
+        elif userInput == "on":
+            print("on")
+        elif userInput == "off":
+            print("off")
         else:
             try:
                 number = int(userInput)
