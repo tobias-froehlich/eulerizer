@@ -57,7 +57,6 @@ def updateConst(const, configFilename):
     
     const["NO_BENDING"] = False
     
-    const["CTRL_CHANNEL"] = 10
     
     const["NOTE_NAMES"] = [
         "fb", "cb", "gb", "db", "ab", "eb", "bb",
