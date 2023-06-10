@@ -100,7 +100,7 @@ while flag[0]:
                message.type == "control_change":
                  if message.channel != const["CTRL_CHANNEL"] - 1:
                      if message.channel + 1 in const["THROUGH_CHANNELS"]:
-                         midi_connection.send(message)
+                         midi_connection.send_through(message)
                      else:
                          for eulerizer in eulerizers:
                              eulerizer.loop(message)

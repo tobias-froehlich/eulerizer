@@ -26,10 +26,10 @@ midi = MidiConnection()
 input("Press enter to start.")
 
 for i in range(2):
-    midi.start_note(60, 100, 0, channel)
+    midi.start_note(60, 100, 0, channel - 1)
     time.sleep(0.5)
-    midi.stop_note(60, channel)
+    midi.stop_note(60, channel - 1)
 
-    midi.start_note(60 + bending, 100, -1, channel)
+    midi.start_note(60 + bending, 100, -1, channel - 1)
     time.sleep(0.5)
-    midi.stop_note(60 + bending, channel)
+    midi.stop_note(60 + bending, channel - 1)
