@@ -28,6 +28,7 @@ def updateConst(const, configFilename):
     const["FACTOR_SEVEN"] = FACTOR_SEVEN
     const["OCTAVES_SHARE_CHANNEL"] = OCTAVES_SHARE_CHANNEL
     const["CTRL_CHANNEL"] = CTRL_CHANNEL
+    const["THROUGH_CHANNELS"] = THROUGH_CHANNELS
     const["PARAMS"] = PARAMS
 
     const["NUMBER_OF_LOOPS_UNTIL_STANDBY"] = const["STANDBY_AFTER_SECONDS"] // const["ACTIVE_SLEEP_DURATION_IN_SECONDS"] + 1

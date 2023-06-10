@@ -20,6 +20,8 @@ OCTAVES_SHARE_CHANNEL = True
 
 CTRL_CHANNEL = 10
 
+THROUGH_CHANNELS = [15,]
+
 PARAMS = [
     {   
         "IN_CHANNEL": 1,

@@ -99,8 +99,11 @@ while flag[0]:
                message.type == "note_off" or \
                message.type == "control_change":
                  if message.channel != const["CTRL_CHANNEL"] - 1:
-                     for eulerizer in eulerizers:
-                         eulerizer.loop(message)
+                     if message.channel + 1 in const["THROUGH_CHANNELS"]:
+                         midi_connection.send(message)
+                     else:
+                         for eulerizer in eulerizers:
+                             eulerizer.loop(message)
                  else:
                      if message.type == "note_on":
                          region = message.note - 56
