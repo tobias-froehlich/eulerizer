@@ -1,6 +1,5 @@
 import numpy as np
 import mido
-from const import *
 
 class MidiConnection:
     
