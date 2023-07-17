@@ -27,7 +27,9 @@ def userInputTask(flag, eulerizers, factorTwo, factorThree, factorFive):
         else:
             words = ["none"]
 
-        if userInput == "quit":
+        if len(words) == 0:
+            pass
+        elif userInput == "quit":
             flag[0] = 0
         elif userInput == "off":
             for i in range(len(const["PARAMS"])):
