@@ -31,9 +31,11 @@ arduino = None
 try:
     arduino = serial.Serial(
         "/dev/ttyUSB0",
+#        "/dev/ttyS4",
         9600
     )
-except:
+except Exception as e:
+    print(e)
     print("Use without pedals.")
 
 flag = [1,]
