@@ -14,6 +14,8 @@ def selectGui(const):
         from Gui_standard7 import Gui
     elif const["EULER_NET"] == "MEANTONE":
         from Gui_meantone import Gui
+    elif const["EULER_NET"] == "ROSE7":
+        from Gui_rose7 import Gui
     return Gui
 
 

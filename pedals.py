@@ -32,11 +32,13 @@ try:
     arduino = serial.Serial(
         "/dev/ttyUSB0",
 #        "/dev/ttyS4",
+#        "/dev/bus/usb/003/024",
         9600
     )
 except Exception as e:
     print(e)
     print("Use without pedals.")
+    
 
 flag = [1,]
 

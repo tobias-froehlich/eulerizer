@@ -4,12 +4,14 @@ import numpy as np
 class Calculator:
 
     def __call__(self, const, bending, noBending, factorTwo, factorThree, factorFive, factorSeven):
-        if const["EULER_NET"] == "STANDARD7":
+        if const["EULER_NET"] in ["STANDARD7", "ROSE7"]:
             return self.__calculate_with_7(const, bending, noBending, factorTwo, factorThree, factorFive, factorSeven)
         elif const["EULER_NET"] in ["STANDARD", "MEANTONE"]:
             return self.__calculate_without_7(const, bending, noBending, factorTwo, factorThree, factorFive)
 
+
     def __calculate_without_7(self, const, bending, noBending, factorTwo, factorThree, factorFive):
+
         self.__midis = []
         self.__freqs = []
         self.__bending = bending
@@ -123,7 +125,6 @@ class Calculator:
 
 
 
- 
     def __calculate_with_7(self, const, bending, noBending, factorTwo, factorThree, factorFive, factorSeven):
         self.__midis = []
         self.__freqs = []
@@ -135,7 +136,7 @@ class Calculator:
             for j in range(const["EULER_ROWS"]):
                 self.__midis[-1].append([])
                 self.__freqs[-1].append([])
-                for i in range(const["EULER_PEDALS"] + 1):
+                for i in range(const["EULER_PEDALS"] + 3):
                     self.__midis[-1][-1].append(
                         const["INIT_MIDI"]
                       + (i - const["INIT_POS"][0]) * 7
@@ -150,7 +151,7 @@ class Calculator:
                     )
         for k in range(const["EULER_LAYERS"]):
             for j in range(const["EULER_ROWS"]):
-                for i in range(const["EULER_PEDALS"] + 1):
+                for i in range(const["EULER_PEDALS"] + 3):
                     midi = self.__midis[k][j][i]
                     freq = self.__freqs[k][j][i]
                     oct = midi // 12
@@ -160,7 +161,36 @@ class Calculator:
 
         self.__intonations = []
         self.__eulis = []
+      
+
+        if const["EULER_NET"] == "STANDARD7":
+            self.__make_intonation_with_7_normal(const, factorTwo)
+        elif const["EULER_NET"] == "ROSE7":
+            self.__make_intonation_with_7_rose(const, factorTwo)
+
+        self.__bendings = []
+        self.__equal_freqs = []
+        for note in range(128):
+            self.__equal_freqs.append(
+                440.0
+              * 2.0**((note - 57)/12)
+            )
         for i in range(const["EULER_PEDALS"]):
+            self.__bendings.append([])
+            for note in range(128):
+                self.__bendings[-1].append(
+                    np.log2(
+                        self.__intonations[i][note]
+                      / self.__equal_freqs[note]
+                    )*12 / self.__bending * (self.__noBending == False)
+                )
+
+
+        return (self.__eulis, self.__bendings)
+        
+
+    def __make_intonation_with_7_normal(self, const, factorTwo):
+         for i in range(const["EULER_PEDALS"]):
             midis = []
             freqs = []
             eulis = []
@@ -185,25 +215,49 @@ class Calculator:
                     eulis[midis.index(note%12)]
                 )
 
-        self.__bendings = []
-        self.__equal_freqs = []
-        for note in range(128):
-            self.__equal_freqs.append(
-                440.0
-              * 2.0**((note - 57)/12)
-            )
-        for i in range(const["EULER_PEDALS"]):
-            self.__bendings.append([])
+    def __make_intonation_with_7_rose(self, const, factorTwo):
+         for i in range(const["EULER_PEDALS"]):
+            midis = []
+            freqs = []
+            eulis = []
+            
+            positions = [
+                [2, 0, 0], # c
+                [1, 2, 0], # cis
+                [0, 1, 0], # d
+                [1, 0, 1], # es
+                [2, 1, 0], # e
+                [1, 0, 0], # f
+                [0, 2, 0], # fis
+                [1, 1, 1], # g
+                [2, 2, 0], # gis
+                [1, 1, 0], # a
+                [2, 0, 1], # bs
+                [3, 1, 0,], # b
+            ]
+            for position in positions:
+                i1 = position[0]
+                j = position[1]
+                k = position[2]
+                midis.append(
+                    self.__midis[k][j][i + i1]
+                )
+                freqs.append(
+                    self.__freqs[k][j][i + i1]
+                )
+                eulis.append((i+i1, j, k))
+
+            self.__intonations.append([])
+            self.__eulis.append([])
+            print("print=", midis)
             for note in range(128):
-                self.__bendings[-1].append(
-                    np.log2(
-                        self.__intonations[i][note]
-                      / self.__equal_freqs[note]
-                    )*12 / self.__bending * (self.__noBending == False)
+                self.__intonations[-1].append(
+                    freqs[midis.index(note%12)]
+                  * factorTwo ** (note // 12)
+                )
+                self.__eulis[-1].append(
+                    eulis[midis.index(note%12)]
                 )
 
-
-        return (self.__eulis, self.__bendings)
-        
 
 

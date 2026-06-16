@@ -49,6 +49,10 @@ def updateConst(const, configFilename):
         const["EULER_COLS"] = 11
         const["EULER_ROWS"] = 3
         const["EULER_LAYERS"] = 2
+    elif const["EULER_NET"] == "ROSE7":
+        const["EULER_COLS"] = 11
+        const["EULER_ROWS"] = 3
+        const["EULER_LAYERS"] = 2
     
     
     const["BACKGROUND_COLOR"] = "white"

@@ -16,7 +16,7 @@ class Eulerizer:
         if eulerNet in ["STANDARD", "MEANTONE"]:
             self.__note_on_format_str = "note_on=%i,%i"
             self.__note_off_format_str = "note_off=%i,%i"
-        elif eulerNet == "STANDARD7":
+        elif eulerNet in ["STANDARD7", "ROSE7"]:
             self.__note_on_format_str = "note_on=%i,%i,%i"
             self.__note_off_format_str = "note_off=%i,%i,%i"
 
